@@ -71,6 +71,14 @@ class Edicao extends Model
     }
     
     /**
+     * Obter a primeira assinatura associada a esta edição (para compatibilidade).
+     */
+    public function assinatura()
+    {
+        return $this->hasOne(Assinatura::class);
+    }
+    
+    /**
      * Obter os downloads associados a esta edição.
      */
     public function downloads()

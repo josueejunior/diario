@@ -31,32 +31,35 @@
         <div class="particle"></div>
     </div>
     
-    <!-- Cabeçalho Fixo -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg">
+    <!-- Cabeçalho Moderno -->
+    <header class="relative bg-white shadow-lg">
         <!-- Barra superior de acessibilidade -->
-        <div class="bg-gray-800 text-white py-2">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-2">
             <div class="container mx-auto px-6">
                 <div class="flex justify-between items-center text-sm">
                     <div class="flex space-x-4">
-                        <button id="accessibility-btn" class="hover:text-gray-300 transition-colors flex items-center">
-                            <i class="fas fa-universal-access mr-1"></i>
+                        <button id="accessibility-btn" class="hover:text-gray-300 transition-colors flex items-center group">
+                            <i class="fas fa-universal-access mr-1 group-hover:scale-110 transition-transform"></i>
                             Acessibilidade
                         </button>
-                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
-                            <i class="fas fa-phone mr-1"></i>
+                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center group">
+                            <i class="fas fa-phone mr-1 group-hover:scale-110 transition-transform"></i>
                             Contato
                         </a>
-                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
-                            <i class="fas fa-info-circle mr-1"></i>
+                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center group">
+                            <i class="fas fa-info-circle mr-1 group-hover:scale-110 transition-transform"></i>
                             Sobre
                         </a>
                     </div>
-                    <div class="flex space-x-4">
-                        <span class="text-gray-300">{{ now()->format('d/m/Y') }}</span>
+                    <div class="flex space-x-4 items-center">
+                        <span class="text-gray-300 flex items-center">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            {{ now()->format('d/m/Y') }}
+                        </span>
                         <div class="accessibility-controls hidden space-x-2">
-                            <button id="increase-font" class="hover:text-gray-300">A+</button>
-                            <button id="decrease-font" class="hover:text-gray-300">A-</button>
-                            <button id="high-contrast" class="hover:text-gray-300">Alto Contraste</button>
+                            <button id="increase-font" class="hover:text-gray-300 px-2 py-1 rounded hover:bg-white/10 transition-all">A+</button>
+                            <button id="decrease-font" class="hover:text-gray-300 px-2 py-1 rounded hover:bg-white/10 transition-all">A-</button>
+                            <button id="high-contrast" class="hover:text-gray-300 px-2 py-1 rounded hover:bg-white/10 transition-all">Alto Contraste</button>
                         </div>
                     </div>
                 </div>
@@ -111,14 +114,35 @@
                         </a>
                         <div class="relative dropdown">
                             <button class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 flex items-center">
-                                Regulamentações
+                                Documentos
                                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
                             </button>
-                            <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Decretos</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Portarias</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Leis</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editais</a>
+                            <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden border border-gray-100">
+                                <a href="{{ route('portal.documentos.portarias') }}" 
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <i class="fas fa-file-alt text-amber-500 mr-2"></i>
+                                    Portarias
+                                </a>
+                                <a href="{{ route('portal.documentos.decretos') }}" 
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                                    Decretos
+                                </a>
+                                <a href="{{ route('portal.documentos.leis') }}" 
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <i class="fas fa-file-alt text-green-500 mr-2"></i>
+                                    Leis
+                                </a>
+                                <a href="{{ route('portal.documentos.resolucoes') }}" 
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <i class="fas fa-file-alt text-purple-500 mr-2"></i>
+                                    Resoluções
+                                </a>
+                                <a href="{{ route('portal.documentos.editais') }}" 
+                                   class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <i class="fas fa-bullhorn text-red-500 mr-2"></i>
+                                    Editais
+                                </a>
                             </div>
                         </div>
                     </nav>

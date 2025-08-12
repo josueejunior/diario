@@ -15,8 +15,16 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Última edição publicada
-        $ultimaEdicao = Edicao::orderBy('data', 'desc')->first();
+        // Última edição publicada (para o novo design será a edicaoRecente)
+        $edicaoRecente = Edicao::with(['assinatura', 'assinaturas', 'visualizacoes', 'downloads'])
+            ->orderBy('data', 'desc')
+            ->first();
+        
+        // Edições recentes para a lista
+        $edicoesRecentes = Edicao::withCount(['materias', 'visualizacoes', 'downloads'])
+            ->orderBy('data', 'desc')
+            ->limit(10)
+            ->get();
         
         // Últimas publicações (matérias mais recentes)
         $ultimasPublicacoes = Materia::with(['tipo', 'orgao'])
@@ -25,9 +33,19 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
         
-        // Estatísticas
-        $totalEdicoes = Edicao::count();
-        $materiasEdicaoAtual = $ultimaEdicao ? $ultimaEdicao->materias()->count() : 0;
+        // Estatísticas para o novo design
+        $stats = [
+            'total_edicoes' => Edicao::count(),
+            'total_materias' => Materia::where('status', 'aprovado')->count(),
+            'total_visualizacoes' => Visualizacao::count(),
+            'total_downloads' => Download::count(),
+            'visualizacoes_edicao_recente' => $edicaoRecente ? $edicaoRecente->visualizacoes()->count() : 0,
+            'downloads_edicao_recente' => $edicaoRecente ? $edicaoRecente->downloads()->count() : 0,
+        ];
+        
+        // Estatísticas antigas para compatibilidade
+        $totalEdicoes = $stats['total_edicoes'];
+        $materiasEdicaoAtual = $edicaoRecente ? $edicaoRecente->materias()->count() : 0;
         
         // Downloads mais populares (últimos 30 dias)
         $downloadsPopulares = Download::with(['edicao'])
@@ -59,14 +77,20 @@ class HomeController extends Controller
                 return $edicao->data->format('Y-m-d');
             });
 
+        // Para compatibilidade com o layout antigo
+        $ultimaEdicao = $edicaoRecente;
+
         return view('home', compact(
-            'ultimaEdicao',
+            'edicaoRecente',
+            'edicoesRecentes', 
             'ultimasPublicacoes',
+            'stats',
             'totalEdicoes',
             'materiasEdicaoAtual',
             'downloadsPopulares',
             'secoesPopulares',
-            'edicoesCalendario'
+            'edicoesCalendario',
+            'ultimaEdicao'
         ));
     }
     

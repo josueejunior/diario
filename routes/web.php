@@ -40,9 +40,16 @@ Route::prefix('diario')->group(function () {
     Route::get('/materias', [PortalMateriaController::class, 'index'])->name('portal.materias.index');
     Route::get('/materias/{materia}', [PortalMateriaController::class, 'show'])->name('portal.materias.show');
     
+    // Documentos por Tipo
+    Route::get('/portarias', [PortalMateriaController::class, 'portarias'])->name('portal.documentos.portarias');
+    Route::get('/decretos', [PortalMateriaController::class, 'decretos'])->name('portal.documentos.decretos');
+    Route::get('/leis', [PortalMateriaController::class, 'leis'])->name('portal.documentos.leis');
+    Route::get('/resolucoes', [PortalMateriaController::class, 'resolucoes'])->name('portal.documentos.resolucoes');
+    Route::get('/editais', [PortalMateriaController::class, 'editais'])->name('portal.documentos.editais');
+    
     // Verificação de Autenticidade
     Route::get('/verificar', [PortalEdicaoController::class, 'verificar'])->name('portal.verificar');
-    Route::post('/verificar', [PortalEdicaoController::class, 'verificarHash'])->name('portal.verificar.hash');
+    Route::post('/verificar', [PortalEdicaoController::class, 'verificarHash'])->name('portal.verificar');
 });
 
 // Rotas Administrativas

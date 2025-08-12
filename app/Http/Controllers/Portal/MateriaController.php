@@ -46,4 +46,75 @@ class MateriaController extends Controller
         
         return view('portal.materias.show', compact('materia'));
     }
+
+    /**
+     * Exibe portarias publicadas.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function portarias()
+    {
+        return $this->materiaPorTipo('Portaria', 'Portarias');
+    }
+
+    /**
+     * Exibe decretos publicados.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function decretos()
+    {
+        return $this->materiaPorTipo('Decreto', 'Decretos');
+    }
+
+    /**
+     * Exibe leis publicadas.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function leis()
+    {
+        return $this->materiaPorTipo('Lei', 'Leis');
+    }
+
+    /**
+     * Exibe resoluções publicadas.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function resolucoes()
+    {
+        return $this->materiaPorTipo('Resolução', 'Resoluções');
+    }
+
+    /**
+     * Exibe editais publicados.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function editais()
+    {
+        return $this->materiaPorTipo('Edital', 'Editais');
+    }
+
+    /**
+     * Método auxiliar para filtrar matérias por tipo.
+     *
+     * @param string $tipo
+     * @param string $titulo
+     * @return \Illuminate\View\View
+     */
+    private function materiaPorTipo($tipo, $titulo)
+    {
+        $materias = Materia::whereHas('edicao', function ($query) {
+                        $query->where('publicado', true);
+                    })
+                    ->whereHas('tipo', function ($query) use ($tipo) {
+                        $query->where('nome', 'like', "%{$tipo}%");
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(15);
+        
+        return view('portal.materias.tipo', compact('materias', 'tipo', 'titulo'));
+    }
 }

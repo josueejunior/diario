@@ -194,27 +194,21 @@ class EdicaoController extends Controller
     /**
      * Registrar uma visualização da edição
      */
-    public function registerView(Edicao $edicao)
+    private function registerView($edicao)
     {
-        // Registrar visualização se não for o mesmo usuário/IP recentemente
-        $ip = request()->ip();
-        $userAgent = request()->userAgent();
-        $today = now()->format('Y-m-d');
-        
-        // Verificar se já foi registrada uma visualização hoje do mesmo IP/User Agent
-        $existingView = \App\Models\Visualizacao::where('edicao_id', $edicao->id)
-                                                ->where('ip_address', $ip)
-                                                ->whereDate('created_at', $today)
-                                                ->first();
-        
-        if (!$existingView) {
-            \App\Models\Visualizacao::create([
+        // Evitar contagens duplicadas do mesmo usuário no mesmo período
+        $existing = Visualizacao::where('edicao_id', $edicao->id)
+            ->where('ip', request()->ip())
+            ->where('created_at', '>=', now()->subHour())
+            ->exists();
+
+        if (!$existing) {
+            Visualizacao::create([
                 'edicao_id' => $edicao->id,
-                'ip_address' => $ip,
-                'user_agent' => $userAgent,
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'origem' => 'web',
             ]);
         }
-        
-        return response()->json(['success' => true]);
     }
 }
