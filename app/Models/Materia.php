@@ -84,4 +84,20 @@ class Materia extends Model
     {
         return $query->where('status', $status);
     }
+    
+    /**
+     * Get the visualizacoes for the materia.
+     */
+    public function visualizacoes()
+    {
+        return $this->hasMany(Visualizacao::class);
+    }
+    
+    /**
+     * Get the edicao that contains this materia.
+     */
+    public function edicao()
+    {
+        return $this->edicoes->first();
+    }
 }

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('visualizacoes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('edicao_id')->constrained('edicoes')->onDelete('cascade');
+            $table->foreignId('edicao_id')->nullable()->constrained('edicoes')->onDelete('cascade');
+            $table->foreignId('materia_id')->nullable()->constrained('materias')->onDelete('cascade');
             $table->string('ip')->nullable();
             $table->string('user_agent')->nullable();
             $table->string('origem')->default('web'); // web, api, etc
@@ -21,6 +22,7 @@ return new class extends Migration
             
             // Índice para contagens e análises
             $table->index(['edicao_id', 'created_at']);
+            $table->index(['materia_id', 'created_at']);
         });
     }
 

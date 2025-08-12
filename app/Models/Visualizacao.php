@@ -23,6 +23,7 @@ class Visualizacao extends Model
      */
     protected $fillable = [
         'edicao_id',
+        'materia_id',
         'ip',
         'user_agent',
         'origem'
@@ -34,5 +35,13 @@ class Visualizacao extends Model
     public function edicao()
     {
         return $this->belongsTo(Edicao::class);
+    }
+    
+    /**
+     * Get the materia associated with the visualizacao.
+     */
+    public function materia()
+    {
+        return $this->belongsTo(Materia::class);
     }
 }

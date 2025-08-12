@@ -47,20 +47,20 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Edições
-    Route::resource('edicoes', EdicaoController::class);
+    Route::resource('edicoes', EdicaoController::class, ['parameters' => ['edicoes' => 'edicao']]);
     Route::post('/edicoes/{edicao}/publicar', [EdicaoController::class, 'publicar'])->name('edicoes.publicar');
     Route::post('/edicoes/{edicao}/assinar', [EdicaoController::class, 'assinar'])->name('edicoes.assinar');
     
     // Matérias
-    Route::resource('materias', MateriaController::class);
+    Route::resource('materias', MateriaController::class, ['parameters' => ['materias' => 'materia']]);
     Route::post('/materias/{materia}/aprovar', [MateriaController::class, 'aprovar'])->name('materias.aprovar');
     Route::post('/materias/{materia}/revisar', [MateriaController::class, 'revisar'])->name('materias.revisar');
     
     // Tipos de Matéria
-    Route::resource('tipos', TipoController::class);
+    Route::resource('tipos', TipoController::class, ['parameters' => ['tipos' => 'tipo']]);
     
     // Órgãos
-    Route::resource('orgaos', OrgaoController::class);
+    Route::resource('orgaos', OrgaoController::class, ['parameters' => ['orgaos' => 'orgao']]);
     
     // Assinaturas
     Route::get('/assinaturas', [AssinaturaController::class, 'index'])->name('assinaturas.index');
