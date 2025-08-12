@@ -15,41 +15,91 @@
     @stack('styles')
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Cabeçalho -->
-    <header class="bg-blue-800 text-white">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <a href="{{ route('portal.home') }}" class="text-2xl font-bold">
-                        Diário Oficial
-                    </a>
+    <!-- Cabeçalho dividido em 3 seções -->
+    <!-- 1. Barra superior de acessibilidade -->
+    <header>
+        <div class="bg-gray-800 text-white py-1">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center text-sm">
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Acessibilidade
+                        </a>
+                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                            </svg>
+                            Contato
+                        </a>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button class="hover:text-gray-300 transition-colors">A+</button>
+                        <button class="hover:text-gray-300 transition-colors">A-</button>
+                        <button class="hover:text-gray-300 transition-colors">Alto Contraste</button>
+                    </div>
                 </div>
-                
-                <!-- Menu de navegação -->
-                <nav class="hidden md:flex items-center space-x-6">
-                    <a href="{{ route('portal.edicoes.index') }}" class="text-white hover:text-blue-200 transition-colors">
+            </div>
+        </div>
+        
+        <!-- 2. Seção do logo e informações principais -->
+        <div class="bg-blue-800 text-white py-4">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <a href="{{ route('portal.home') }}" class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <div>
+                                <div class="text-2xl font-bold">Diário Oficial</div>
+                                <div class="text-sm text-blue-200">Publicações Oficiais</div>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="text-sm text-blue-200">{{ now()->format('l, d \de F \de Y') }}</div>
+                            <div class="text-xs">Última atualização: {{ now()->format('H:i') }}</div>
+                        </div>
+                        @auth
+                            <a href="{{ route('dashboard') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
+                                Área Administrativa
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
+                                Login
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 3. Barra de navegação principal -->
+        <div class="bg-blue-700 shadow-md">
+            <div class="container mx-auto px-4">
+                <!-- Menu de navegação desktop -->
+                <nav class="hidden md:flex items-center py-3">
+                    <a href="{{ route('portal.home') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
+                        Início
+                    </a>
+                    <a href="{{ route('portal.edicoes.index') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
                         Edições
                     </a>
-                    <a href="{{ route('portal.materias.index') }}" class="text-white hover:text-blue-200 transition-colors">
+                    <a href="{{ route('portal.materias.index') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
                         Matérias
                     </a>
-                    <a href="{{ route('portal.verificar') }}" class="text-white hover:text-blue-200 transition-colors">
+                    <a href="{{ route('portal.verificar') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
                         Verificar Autenticidade
                     </a>
-                    
-                    @auth
-                        <a href="{{ route('dashboard') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
-                            Área Administrativa
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
-                            Login
-                        </a>
-                    @endauth
                 </nav>
                 
-                <!-- Menu móvel -->
-                <div class="md:hidden">
+                <!-- Menu móvel toggle -->
+                <div class="md:hidden py-2 flex justify-end">
                     <button id="menu-toggle" class="text-white focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -59,7 +109,7 @@
             </div>
             
             <!-- Menu móvel expansível -->
-            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-2">
+            <div id="mobile-menu" class="hidden md:hidden container mx-auto px-4 py-2 bg-blue-700">
                 <a href="{{ route('portal.edicoes.index') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md">
                     Edições
                 </a>
