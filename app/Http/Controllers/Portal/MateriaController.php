@@ -16,7 +16,7 @@ class MateriaController extends Controller
     public function index()
     {
         // Busca as matérias mais recentes de edições publicadas
-        $materias = Materia::whereHas('edicao', function ($query) {
+        $materias = Materia::whereHas('edicoes', function ($query) {
                         $query->where('publicado', true);
                     })
                     ->orderBy('created_at', 'desc')
@@ -106,7 +106,7 @@ class MateriaController extends Controller
      */
     private function materiaPorTipo($tipo, $titulo)
     {
-        $materias = Materia::whereHas('edicao', function ($query) {
+        $materias = Materia::whereHas('edicoes', function ($query) {
                         $query->where('publicado', true);
                     })
                     ->whereHas('tipo', function ($query) use ($tipo) {
