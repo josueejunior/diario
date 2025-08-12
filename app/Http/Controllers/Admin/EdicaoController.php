@@ -39,11 +39,16 @@ class EdicaoController extends Controller
      */
     public function store(Request $request)
     {
+        // Aumentar o limite de tamanho para upload antes da validação
+        ini_set('upload_max_filesize', '100M');
+        ini_set('post_max_size', '100M');
+        ini_set('memory_limit', '256M');
+        
         $request->validate([
             'numero' => 'required|string|max:255|unique:edicoes,numero',
             'data' => 'required|date',
             'tipo' => 'required|in:normal,extra',
-            'arquivo_pdf' => 'required|file|mimes:pdf|max:10240',
+            'arquivo_pdf' => 'required|file|mimes:pdf|max:102400', // 100MB em kilobytes
         ]);
 
         $arquivo = $request->file('arquivo_pdf');
@@ -100,11 +105,18 @@ class EdicaoController extends Controller
      */
     public function update(Request $request, Edicao $edicao)
     {
+        // Aumentar o limite de tamanho para upload antes da validação
+        ini_set('upload_max_filesize', '100M');
+        ini_set('post_max_size', '100M');
+        ini_set('memory_limit', '256M');
+        ini_set('max_execution_time', '300');
+        ini_set('max_input_time', '300');
+        
         $request->validate([
             'numero' => 'required|string|max:255|unique:edicoes,numero,' . $edicao->id,
             'data' => 'required|date',
             'tipo' => 'required|in:normal,extra',
-            'arquivo_pdf' => 'nullable|file|mimes:pdf|max:10240',
+            'arquivo_pdf' => 'nullable|file|mimes:pdf|max:102400', // 100MB em kilobytes
         ]);
 
         $dados = [

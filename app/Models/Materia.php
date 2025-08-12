@@ -94,10 +94,13 @@ class Materia extends Model
     }
     
     /**
-     * Get the edicao that contains this materia.
+     * Get the first edicao that contains this materia.
+     * This is an accessor method, not a relationship
+     * 
+     * @return \App\Models\Edicao|null
      */
-    public function edicao()
+    public function getEdicaoAttribute()
     {
-        return $this->edicoes->first();
+        return $this->edicoes()->latest()->first();
     }
 }

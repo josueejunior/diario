@@ -95,7 +95,7 @@ class RelatorioController extends Controller
                 DB::raw('DATE(created_at) as data'),
                 DB::raw('count(*) as total')
             )
-            ->groupBy('data')
+            ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('data')
             ->limit(30)
             ->get();
@@ -155,7 +155,7 @@ class RelatorioController extends Controller
                 DB::raw('DATE(created_at) as data'),
                 DB::raw('count(*) as total')
             )
-            ->groupBy('data')
+            ->groupBy(DB::raw('DATE(created_at)'))
             ->orderBy('data')
             ->limit(30)
             ->get();
@@ -215,7 +215,7 @@ class RelatorioController extends Controller
                 DB::raw('count(*) as total')
             )
             ->where('publicado', true)
-            ->groupBy('data')
+            ->groupBy(DB::raw('DATE(data_publicacao)'))
             ->orderBy('data')
             ->limit(30)
             ->get();

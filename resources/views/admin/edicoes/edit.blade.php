@@ -61,12 +61,15 @@
                             <label for="arquivo_pdf" class="block text-sm font-medium text-gray-700">Arquivo PDF (Opcional)</label>
                             <input type="file" name="arquivo_pdf" id="arquivo_pdf"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <p class="text-gray-500 text-xs mt-1">Tamanho máximo: 10MB</p>
+                            <p class="text-gray-500 text-xs mt-1">Tamanho máximo: 100MB</p>
                             
                             @if ($edicao->caminho_arquivo)
-                                <div class="mt-2">
+                                <div class="mt-2 flex items-center">
+                                    <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
                                     <p class="text-sm">Arquivo atual: 
-                                        <a href="{{ Storage::url($edicao->caminho_arquivo) }}" target="_blank" class="text-blue-600 hover:text-blue-900">
+                                        <a href="{{ Storage::url($edicao->caminho_arquivo) }}" target="_blank" class="text-blue-600 hover:text-blue-900 font-medium">
                                             Ver PDF
                                         </a>
                                     </p>

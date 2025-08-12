@@ -11,7 +11,10 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold">Lista de Matérias</h3>
-                        <a href="{{ route('materias.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="{{ route('materias.create') }}" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 shadow-sm">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
                             Nova Matéria
                         </a>
                     </div>
@@ -82,7 +85,7 @@
                                     <th class="py-2 px-4 border-b text-left">Órgão</th>
                                     <th class="py-2 px-4 border-b text-left">Data</th>
                                     <th class="py-2 px-4 border-b text-left">Status</th>
-                                    <th class="py-2 px-4 border-b text-left">Ações</th>
+                                    <th class="py-2 px-4 border-b text-left w-32">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,19 +112,36 @@
                                             @endswitch
                                         </td>
                                         <td class="py-2 px-4 border-b">
-                                            <div class="flex space-x-2">
-                                                <a href="{{ route('materias.show', $materia) }}" class="text-blue-600 hover:text-blue-900">Ver</a>
-                                                <a href="{{ route('materias.edit', $materia) }}" class="text-yellow-600 hover:text-yellow-900">Editar</a>
+                                            <div class="flex items-center space-x-1 whitespace-nowrap">
+                                                <a href="{{ route('materias.show', $materia) }}" class="inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                </a>
+                                                <a href="{{ route('materias.edit', $materia) }}" class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors duration-200">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                                    </svg>
+                                                </a>
                                                 @if ($materia->status === 'pendente')
-                                                    <form method="POST" action="{{ route('materias.aprovar', $materia) }}" class="inline">
+                                                    <form method="POST" action="{{ route('materias.aprovar', $materia) }}" class="inline-block">
                                                         @csrf
-                                                        <button type="submit" class="text-green-600 hover:text-green-900">Aprovar</button>
+                                                        <button type="submit" class="inline-flex items-center px-2 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                        </button>
                                                     </form>
                                                 @endif
-                                                <form method="POST" action="{{ route('materias.destroy', $materia) }}" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria?');">
+                                                <form method="POST" action="{{ route('materias.destroy', $materia) }}" class="inline-block" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900">Excluir</button>
+                                                    <button type="submit" class="inline-flex items-center px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                        </svg>
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>
