@@ -48,32 +48,60 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Diário Oficial</h1>
     
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <!-- Coluna da Esquerda - Edição mais recente e Prévia do PDF -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                 @if(isset($edicaoRecente))
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-semibold text-gray-700">
-                            Edição Nº {{ $edicaoRecente->numero }} - {{ $edicaoRecente->data_publicacao->format('d/m/Y') }}
-                        </h2>
-                        <div class="flex items-center space-x-2">
-                            <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" 
-                               class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
-                                Detalhes
-                            </a>
-                            <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}"
-                               class="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm">
-                                Download
-                            </a>
+                    <div class="flex flex-col mb-4">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-semibold text-gray-700">
+                                {{ $edicaoRecente->numero }}ª Edição de {{ $edicaoRecente->data_publicacao->locale('pt-BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" 
+                                   class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
+                                    Detalhes
+                                </a>
+                                <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}"
+                                   class="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm">
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Informações de estatísticas -->
+                        <div class="flex items-center mt-2 text-gray-600">
+                            <div class="flex items-center mr-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-semibold">{{ str_pad($edicaoRecente->visualizacoes_count ?? $edicaoRecente->visualizacoes, 3, '0', STR_PAD_LEFT) }}</span>
+                                <span class="ml-1">Visualizações</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-semibold">{{ str_pad($edicaoRecente->downloads_count ?? $edicaoRecente->downloads, 3, '0', STR_PAD_LEFT) }}</span>
+                                <span class="ml-1">Downloads</span>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Prévia do PDF -->
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
-                        <iframe src="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" class="pdf-preview"></iframe>
+                    <!-- Prévia do PDF com mensagem de clique -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden relative group">
+                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <div class="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
+                                <p class="text-lg font-medium text-gray-800">Clique na imagem para ler online</p>
+                                <p class="text-sm text-gray-600 mt-1">Você também pode baixar a edição completa</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" target="_blank" class="block">
+                            <iframe src="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" class="pdf-preview"></iframe>
+                        </a>
                     </div>
                 @else
                     <div class="text-center py-12">

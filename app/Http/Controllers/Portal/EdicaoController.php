@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Edicao;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+ 
 
 class EdicaoController extends Controller
 {
@@ -20,9 +23,10 @@ class EdicaoController extends Controller
                          ->where('publicado', true)
                          ->paginate(10);
         
-        // Obtém a edição mais recente para exibição do PDF
+        // Obtém a edição mais recente para exibição do PDF com contadores
         $edicaoRecente = Edicao::where('publicado', true)
                                ->orderBy('data_publicacao', 'desc')
+                               ->withCount('visualizacoes', 'downloads')
                                ->first();
         
         // Obtém as datas das edições do mês atual para o calendário
@@ -87,21 +91,34 @@ class EdicaoController extends Controller
      * Gera o PDF de uma edição.
      *
      * @param  \App\Models\Edicao  $edicao
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     public function pdf(Edicao $edicao)
     {
-        // Verifica se existe o arquivo PDF no storage
-        $pdfPath = "edicoes/{$edicao->id}.pdf";
+        // Registrar a visualização para estatísticas
+        $edicao->visualizacoes()->create([
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
         
-        if (!$edicao->caminho_arquivo || !storage_path("app/public/{$edicao->caminho_arquivo}")) {
-            // Se não existir, gera um PDF simples com os dados da edição
-            $pdf = app('App\Services\PdfService')->gerarPdfEdicao($edicao);
-            return $pdf->stream("edicao-{$edicao->numero}.pdf");
+        // Incrementa o contador de visualizações
+        $edicao->increment('visualizacoes');
+        
+        // Verificar se tem caminho de arquivo definido
+        if ($edicao->caminho_arquivo && Storage::disk('public')->exists($edicao->caminho_arquivo)) {
+            // Se o arquivo existir, retorna o arquivo
+            return response()->file(
+                storage_path("app/public/{$edicao->caminho_arquivo}"), 
+                ['Content-Type' => 'application/pdf']
+            );
         }
         
-        // Se o arquivo existir, retorna o arquivo
-        return response()->file(storage_path("app/public/{$edicao->caminho_arquivo}"), [
+        // Se não existir, gera um PDF simples com os dados da edição
+        $pdfService = app()->make('App\Services\PdfService');
+        $pdf = $pdfService->gerarPdfEdicao($edicao);
+        
+        // Dompdf retorna o stream, que podemos retornar como resposta HTTP
+        return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="edicao-'.$edicao->numero.'.pdf"'
         ]);
@@ -136,5 +153,41 @@ class EdicaoController extends Controller
         }
         
         return back()->with('error', 'Hash não encontrado. O documento pode não ser autêntico.');
+    }
+    
+    /**
+     * Registra um download e serve o arquivo.
+     *
+     * @param  \App\Models\Edicao  $edicao
+     * @return \Illuminate\Http\Response
+     */
+    public function download(Edicao $edicao)
+    {
+        // Registrar o download para estatísticas
+        $edicao->downloads()->create([
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+        
+        // Incrementa o contador de downloads
+        $edicao->increment('downloads');
+        
+        // Verificar se tem caminho de arquivo definido
+        if ($edicao->caminho_arquivo && Storage::disk('public')->exists($edicao->caminho_arquivo)) {
+            return response()->download(
+                storage_path("app/public/{$edicao->caminho_arquivo}"),
+                "edicao-{$edicao->numero}.pdf",
+                ['Content-Type' => 'application/pdf']
+            );
+        }
+        
+        // Se não existir o arquivo, gera um PDF e o retorna
+        $pdfService = app()->make('App\Services\PdfService');
+        $pdf = $pdfService->gerarPdfEdicao($edicao);
+        
+        return response($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="edicao-'.$edicao->numero.'.pdf"'
+        ]);
     }
 }
