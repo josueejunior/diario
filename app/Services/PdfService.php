@@ -10,7 +10,7 @@ use Dompdf\Options;
 class PdfService
 {
     /**
-     * Gerar PDF para uma edição
+     * Gerar PDF para uma edição e salvar no storage
      */
     public function gerarPdf(Edicao $edicao)
     {
@@ -44,5 +44,31 @@ class PdfService
         ]);
 
         return $filename;
+    }
+    
+    /**
+     * Gerar PDF para visualização no browser (sem salvar)
+     */
+    public function gerarPdfEdicao(Edicao $edicao)
+    {
+        // Configurar Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Gerar conteúdo HTML
+        $html = view('pdf.edicao', compact('edicao'))->render();
+
+        // Carregar HTML no Dompdf
+        $dompdf->loadHtml($html);
+
+        // Renderizar PDF
+        $dompdf->render();
+
+        return $dompdf;
     }
 }
