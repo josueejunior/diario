@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'cpf',
+        'cargo',
+        'ac_certificado',
+        'pode_assinar',
     ];
 
     /**
@@ -41,5 +45,35 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'pode_assinar' => 'boolean',
     ];
+
+    /**
+     * Verificar se o usuário pode assinar documentos
+     */
+    public function podeAssinar()
+    {
+        return $this->pode_assinar && !empty($this->cpf) && !empty($this->cargo);
+    }
+
+    /**
+     * Obter o CPF formatado
+     */
+    public function getCpfFormatadoAttribute()
+    {
+        if (!$this->cpf) return null;
+        
+        return substr($this->cpf, 0, 3) . '.' . 
+               substr($this->cpf, 3, 3) . '.' . 
+               substr($this->cpf, 6, 3) . '-' . 
+               substr($this->cpf, 9, 2);
+    }
+
+    /**
+     * Obter identificador completo para assinatura
+     */
+    public function getIdentificadorAssinaturaAttribute()
+    {
+        return strtoupper($this->name) . ':' . $this->cpf;
+    }
 }

@@ -1,314 +1,511 @@
 @extends('layouts.portal')
 
-@section('title', 'Diário Oficial - Edições Recentes')
+@section('title', 'Diário Oficial - Home')
 
 @push('styles')
 <style>
-    .calendar {
+    .pdf-viewer {
         width: 100%;
+        height: 800px;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .calendar th {
-        text-align: center;
-        padding: 0.5rem;
+    
+    .pdf-viewer:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     }
-    .calendar td {
-        text-align: center;
-        padding: 0.5rem;
+    
+    .pdf-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
     }
-    .calendar .has-edicao {
-        background-color: #dbeafe;
-        color: #1e40af;
-        border-radius: 50%;
+    
+    .pdf-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23cbd5e1' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E");
+        pointer-events: none;
+    }
+    
+    .dropdown-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .dropdown-button {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
     }
-    .calendar .today {
-        border: 2px solid #3b82f6;
+    
+    .dropdown-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     }
-    .pdf-preview {
-        width: 100%;
-        height: 600px;
-        border: none;
+    
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 8px;
+        display: none;
     }
-    .date-selector {
+    
+    .dropdown-menu.show {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+    
+    .dropdown-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8fafc;
+    }
+    
+    .dropdown-item.selected {
+        background-color: #eff6ff;
+        color: #1e40af;
+        font-weight: 600;
+    }
+    
+    .hero-section {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         margin-bottom: 1rem;
     }
-    .date-selector button {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        font-size: 1.25rem;
-        color: #4b5563;
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+    
+    .stat-item {
+        background: white;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e40af;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .action-button {
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .action-button.primary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    
+    .action-button.secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+    }
+    
+    .action-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .pdf-viewer {
+            height: 600px;
+        }
+        
+        .stats-container {
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            min-width: 100px;
+            padding: 0.75rem 1.5rem;
+        }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <!-- Coluna da Esquerda - Edição mais recente e Prévia do PDF -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                @if(isset($edicaoRecente))
-                    <div class="flex flex-col mb-4">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-2xl font-semibold text-gray-700">
-                                {{ $edicaoRecente->numero }}ª Edição de {{ $edicaoRecente->data_publicacao->locale('pt-BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
-                            </h2>
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" 
-                                   class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
-                                    Detalhes
-                                </a>
-                                <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}"
-                                   class="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm">
-                                    Download
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- Informações de estatísticas -->
-                        <div class="flex items-center mt-2 text-gray-600">
-                            <div class="flex items-center mr-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="font-semibold">{{ str_pad($edicaoRecente->visualizacoes_count ?? $edicaoRecente->visualizacoes, 3, '0', STR_PAD_LEFT) }}</span>
-                                <span class="ml-1">Visualizações</span>
-                            </div>
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="font-semibold">{{ str_pad($edicaoRecente->downloads_count ?? $edicaoRecente->downloads, 3, '0', STR_PAD_LEFT) }}</span>
-                                <span class="ml-1">Downloads</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Prévia do PDF com mensagem de clique -->
-                    <div class="border border-gray-200 rounded-lg overflow-hidden relative group">
-                        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <div class="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
-                                <p class="text-lg font-medium text-gray-800">Clique na imagem para ler online</p>
-                                <p class="text-sm text-gray-600 mt-1">Você também pode baixar a edição completa</p>
-                            </div>
-                        </div>
-                        <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" target="_blank" class="block">
-                            <iframe src="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" class="pdf-preview"></iframe>
-                        </a>
-                    </div>
-                @else
-                    <div class="text-center py-12">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <h3 class="mt-2 text-xl font-medium text-gray-900">Nenhuma edição disponível</h3>
-                        <p class="mt-1 text-sm text-gray-500">Não há edições publicadas para exibição.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Seção Hero -->
+    <div class="hero-section">
+        <h1 class="hero-title">Diário Oficial Municipal</h1>
+        <p class="hero-subtitle">Acesso rápido e transparente aos atos oficiais do município</p>
         
-        <!-- Coluna da Direita - Calendário e Verificação -->
-        <div class="lg:col-span-1">
-            <!-- Calendário -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Calendário de Publicações</h2>
-                
-                <div class="date-selector">
-                    <button class="prev-month" onclick="changeMonth(-1)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <span class="month-year font-medium">{{ $dataAtual->format('F Y') }}</span>
-                    <button class="next-month" onclick="changeMonth(1)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+        @if(isset($edicaoRecente))
+            <!-- Stats da Edição Atual -->
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number">{{ $edicaoRecente->numero }}</span>
+                    <div class="stat-label">Edição Atual</div>
                 </div>
-                
-                <table class="calendar">
-                    <thead>
-                        <tr>
-                            <th>Dom</th>
-                            <th>Seg</th>
-                            <th>Ter</th>
-                            <th>Qua</th>
-                            <th>Qui</th>
-                            <th>Sex</th>
-                            <th>Sáb</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calendar-body">
-                        <!-- Preenchido via JavaScript -->
-                    </tbody>
-                </table>
-                
-                <div class="mt-4 text-sm">
-                    <div class="flex items-center mb-2">
-                        <span class="w-3 h-3 inline-block mr-2 bg-blue-100 border border-blue-300 rounded-full"></span>
-                        <span>Dias com publicações</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 inline-block mr-2 border-2 border-blue-500 rounded-full"></span>
-                        <span>Hoje</span>
-                    </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ str_pad($edicaoRecente->visualizacoes_count ?? $edicaoRecente->visualizacoes ?? 0, 3, '0', STR_PAD_LEFT) }}</span>
+                    <div class="stat-label">Visualizações</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ str_pad($edicaoRecente->downloads_count ?? $edicaoRecente->downloads ?? 0, 3, '0', STR_PAD_LEFT) }}</span>
+                    <div class="stat-label">Downloads</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ $edicaoRecente->materias()->count() ?? 0 }}</span>
+                    <div class="stat-label">Matérias</div>
                 </div>
             </div>
             
-            <!-- Verificação de Autenticidade -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Verificação de Autenticidade</h2>
-                <p class="text-gray-600 mb-4">
-                    Para verificar a autenticidade de um documento, utilize a ferramenta de verificação.
-                </p>
+            <!-- Dropdown de Seleção de Edição -->
+            <div class="dropdown-container">
+                <button class="dropdown-button" onclick="toggleDropdown()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 3a1 1 0 012 0v5.5a.5.5 0 001 0V4a1 1 0 112 0v4.5a.5.5 0 001 0V6a1 1 0 112 0v6a2 2 0 01-2 2h-5a2 2 0 01-2-2V3z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="selected-edition">{{ $edicaoRecente->numero }}ª Edição - {{ $edicaoRecente->data_publicacao ? $edicaoRecente->data_publicacao->format('d/m/Y') : $edicaoRecente->data->format('d/m/Y') }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                
+                <div class="dropdown-menu" id="dropdown-menu">
+                    @foreach($edicoes->take(10) as $edicao)
+                        <div class="dropdown-item {{ $loop->first ? 'selected' : '' }}" 
+                             onclick="selectEdition({{ $edicao->id }}, '{{ $edicao->numero }}ª Edição - {{ $edicao->data_publicacao ? $edicao->data_publicacao->format('d/m/Y') : $edicao->data->format('d/m/Y') }}', '{{ route('portal.edicoes.pdf', $edicao) }}')">
+                            <div>
+                                <div class="font-semibold">Edição Nº {{ $edicao->numero }}</div>
+                                <div class="text-sm text-gray-600">{{ $edicao->data_publicacao ? $edicao->data_publicacao->format('d/m/Y') : $edicao->data->format('d/m/Y') }}</div>
+                            </div>
+                            @if($loop->first)
+                                <div class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Atual</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+    
+    @if(isset($edicaoRecente))
+        <!-- Container do PDF Centralizado -->
+        <div class="pdf-container">
+            <div class="text-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                    {{ $edicaoRecente->numero }}ª Edição - {{ $edicaoRecente->data_publicacao->locale('pt-BR')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                </h2>
+                <p class="text-gray-600">Visualização da primeira página • Clique no PDF para navegar</p>
+            </div>
+            
+            <div class="relative">
+                <iframe 
+                    id="pdf-viewer"
+                    src="{{ route('portal.edicoes.pdf', $edicaoRecente) }}#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH" 
+                    class="pdf-viewer"
+                    title="Visualização do Diário Oficial - Edição {{ $edicaoRecente->numero }}">
+                    <p>Seu navegador não suporta a visualização de PDFs. 
+                       <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" class="text-blue-600 hover:underline">Clique aqui para baixar o arquivo</a>.
+                    </p>
+                </iframe>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+                <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" 
+                   target="_blank" 
+                   class="action-button primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Ler Edição Completa
+                </a>
+                
+                <a href="{{ route('portal.edicoes.pdf', $edicaoRecente) }}" 
+                   download 
+                   class="action-button secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download PDF
+                </a>
+                
+                <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" 
+                   class="action-button secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Ver Detalhes
+                </a>
+                
                 <a href="{{ route('portal.verificar') }}" 
-                   class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors inline-block text-center">
-                    Verificar Documento
+                   class="action-button secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Verificar Autenticidade
                 </a>
             </div>
         </div>
-    </div>
-    
-    <!-- Lista de Edições Recentes -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Edições Recentes</h2>
         
-        @if($edicoes->isEmpty())
-            <div class="bg-gray-100 p-4 rounded-md text-center">
-                <p class="text-gray-600">Nenhuma edição publicada ainda.</p>
+        <!-- Seção de Edições Anteriores (compacta) -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Edições Anteriores</h2>
+                <a href="{{ route('portal.edicoes.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                    Ver todas
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
             </div>
-        @else
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($edicoes as $edicao)
-                    <div class="border border-gray-200 rounded-lg hover:shadow-lg transition-shadow duration-300 bg-white">
-                        <div class="p-5">
-                            <h3 class="text-xl font-semibold text-gray-800 mb-2">
-                                Edição Nº {{ $edicao->numero }}
-                            </h3>
-                            <p class="text-gray-600 mb-3">
-                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2">
-                                    {{ $edicao->data_publicacao->format('d/m/Y') }}
-                                </span>
-                            </p>
-                            
-                            @if($edicao->descricao)
-                                <p class="text-gray-600 mb-4 text-sm">
-                                    {{ \Illuminate\Support\Str::limit($edicao->descricao, 100) }}
-                                </p>
-                            @endif
-                            
-                            <div class="flex space-x-3 mt-4">
-                                <a href="{{ route('portal.edicoes.show', $edicao) }}" 
-                                   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
-                                    Visualizar
-                                </a>
-                                
-                                <a href="{{ route('portal.edicoes.pdf', $edicao) }}"
-                                   class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm">
-                                    Download PDF
-                                </a>
-                            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($edicoes->skip(1)->take(6) as $edicao)
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-800">Edição Nº {{ $edicao->numero }}</h3>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                {{ $edicao->data_publicacao ? $edicao->data_publicacao->format('d/m/Y') : $edicao->data->format('d/m/Y') }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex space-x-2 mt-3">
+                            <a href="{{ route('portal.edicoes.show', $edicao) }}" 
+                               class="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+                                Visualizar
+                            </a>
+                            <a href="{{ route('portal.edicoes.pdf', $edicao) }}" 
+                               class="px-3 py-2 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors">
+                                PDF
+                            </a>
                         </div>
                     </div>
                 @endforeach
             </div>
-            
-            <div class="mt-6">
-                {{ $edicoes->links() }}
-            </div>
-        @endif
-    </div>
+        </div>
+    @else
+        <div class="text-center py-12 bg-white rounded-lg shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2">Nenhuma edição disponível</h3>
+            <p class="text-gray-600">Não há edições publicadas para exibição no momento.</p>
+        </div>
+    @endif
 </div>
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        renderCalendar();
+document.addEventListener('DOMContentLoaded', function() {
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('dropdown-menu');
+        const button = document.querySelector('.dropdown-button');
+        
+        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
     });
     
-    // Dados de edições por data (a partir do backend)
-    const datasComEdicoes = @json($datasEdicoes);
-    const mesesAnteriores = @json($mesesAnteriores);
-    let dataAtual = new Date('{{ $dataAtual->format('Y-m-d') }}');
+    // Melhorar a experiência do iframe
+    const pdfViewer = document.getElementById('pdf-viewer');
+    if (pdfViewer) {
+        pdfViewer.addEventListener('load', function() {
+            // PDF carregado com sucesso
+            console.log('PDF carregado');
+        });
+        
+        pdfViewer.addEventListener('error', function() {
+            // Erro ao carregar PDF
+            console.error('Erro ao carregar PDF');
+        });
+    }
+});
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdown-menu');
+    dropdown.classList.toggle('show');
+}
+
+function selectEdition(editionId, editionLabel, pdfUrl) {
+    // Atualizar o texto do botão
+    document.getElementById('selected-edition').textContent = editionLabel;
     
-    function renderCalendar() {
-        const year = dataAtual.getFullYear();
-        const month = dataAtual.getMonth();
-        
-        document.querySelector('.month-year').textContent = new Date(year, month, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        
-        const calendarBody = document.getElementById('calendar-body');
-        calendarBody.innerHTML = '';
-        
-        let date = 1;
-        const today = new Date();
-        
-        // Cria as linhas do calendário
-        for (let i = 0; i < 6; i++) {
-            // Cria uma linha
-            const row = document.createElement('tr');
-            
-            // Cria as células da linha
-            for (let j = 0; j < 7; j++) {
-                const cell = document.createElement('td');
-                
-                if (i === 0 && j < firstDay.getDay()) {
-                    // Células vazias antes do primeiro dia do mês
-                    cell.textContent = '';
-                } else if (date > lastDay.getDate()) {
-                    // Células vazias após o último dia do mês
-                    break;
-                } else {
-                    // Células com datas
-                    cell.textContent = date;
-                    
-                    // Formata a data para verificar se há edições
-                    const currentDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-                    
-                    // Verifica se é o dia atual
-                    if (today.getDate() === date && today.getMonth() === month && today.getFullYear() === year) {
-                        cell.classList.add('today');
-                    }
-                    
-                    // Verifica se há edições na data
-                    if (datasComEdicoes.includes(currentDate)) {
-                        cell.classList.add('has-edicao');
-                        cell.onclick = function() {
-                            window.location.href = '{{ route("portal.edicoes.index") }}?data=' + currentDate;
-                        };
-                    }
-                    
-                    date++;
-                }
-                
-                row.appendChild(cell);
-            }
-            
-            calendarBody.appendChild(row);
-            
-            // Se já preenchemos todos os dias, saímos do loop
-            if (date > lastDay.getDate()) {
-                break;
+    // Atualizar o iframe
+    const pdfViewer = document.getElementById('pdf-viewer');
+    if (pdfViewer) {
+        pdfViewer.src = pdfUrl + '#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH';
+    }
+    
+    // Atualizar os botões de ação
+    const actionButtons = document.querySelectorAll('.action-button');
+    actionButtons.forEach(button => {
+        if (button.href && button.href.includes('/pdf')) {
+            if (button.hasAttribute('download')) {
+                button.href = pdfUrl; // Download
+            } else if (button.target === '_blank') {
+                button.href = pdfUrl; // Ler completo
             }
         }
-    }
+    });
     
-    function changeMonth(step) {
-        dataAtual.setMonth(dataAtual.getMonth() + step);
-        renderCalendar();
+    // Remover classe selected de todos os itens
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Adicionar classe selected ao item clicado
+    event.target.closest('.dropdown-item').classList.add('selected');
+    
+    // Fechar dropdown
+    document.getElementById('dropdown-menu').classList.remove('show');
+    
+    // Scroll suave até o PDF
+    document.querySelector('.pdf-container').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+    });
+}
+
+// Adicionar efeitos de hover nos botões
+document.addEventListener('DOMContentLoaded', function() {
+    const actionButtons = document.querySelectorAll('.action-button');
+    actionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Adicionar loading state para o iframe
+function showPdfLoading() {
+    const pdfViewer = document.getElementById('pdf-viewer');
+    if (pdfViewer) {
+        pdfViewer.style.filter = 'blur(2px)';
+        pdfViewer.style.opacity = '0.7';
+        
+        // Remover loading após 2 segundos
+        setTimeout(() => {
+            pdfViewer.style.filter = 'none';
+            pdfViewer.style.opacity = '1';
+        }, 2000);
     }
+}
+
+// Adicionar animação de entrada
+document.addEventListener('DOMContentLoaded', function() {
+    const elements = document.querySelectorAll('.hero-section, .pdf-container, .stat-item');
+    elements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            element.style.transition = 'all 0.6s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
 </script>
 @endpush
 @endsection

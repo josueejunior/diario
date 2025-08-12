@@ -190,4 +190,31 @@ class EdicaoController extends Controller
             'Content-Disposition' => 'attachment; filename="edicao-'.$edicao->numero.'.pdf"'
         ]);
     }
+    
+    /**
+     * Registrar uma visualização da edição
+     */
+    public function registerView(Edicao $edicao)
+    {
+        // Registrar visualização se não for o mesmo usuário/IP recentemente
+        $ip = request()->ip();
+        $userAgent = request()->userAgent();
+        $today = now()->format('Y-m-d');
+        
+        // Verificar se já foi registrada uma visualização hoje do mesmo IP/User Agent
+        $existingView = \App\Models\Visualizacao::where('edicao_id', $edicao->id)
+                                                ->where('ip_address', $ip)
+                                                ->whereDate('created_at', $today)
+                                                ->first();
+        
+        if (!$existingView) {
+            \App\Models\Visualizacao::create([
+                'edicao_id' => $edicao->id,
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+            ]);
+        }
+        
+        return response()->json(['success' => true]);
+    }
 }

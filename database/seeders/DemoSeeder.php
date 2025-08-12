@@ -21,8 +21,12 @@ class DemoSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@diario.gov.br'],
             [
-                'name' => 'Administrador',
+                'name' => 'Elaine Maria Ferreira Costa',
                 'password' => bcrypt('admin123'),
+                'cpf' => '00788952943',
+                'cargo' => 'Expedidora',
+                'ac_certificado' => 'AC SAFEWEB RFB v5',
+                'pode_assinar' => true,
             ]
         );
         
@@ -67,7 +71,7 @@ class DemoSeeder extends Seeder
                     'data' => now()->subDays(30 - $i * 5),
                     'tipo' => 'normal',
                     'hash' => Str::random(16),
-                    'arquivo_pdf' => 'edicoes/' . $i . '.pdf',
+                    'caminho_arquivo' => 'edicoes/' . $i . '.pdf',
                     'carimbo_tempo' => now(),
                     'signatario' => 'Autoridade Certificadora',
                     'ac' => 'AC-DIARIO',

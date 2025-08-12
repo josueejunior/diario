@@ -8,6 +8,9 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -15,209 +18,287 @@
     @stack('styles')
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Cabeçalho dividido em 3 seções -->
-    <!-- 1. Barra superior de acessibilidade -->
-    <header>
-        <div class="bg-gray-800 text-white py-1">
-            <div class="container mx-auto px-4">
+    <!-- Partículas flutuantes de fundo -->
+    <div class="floating-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <!-- Cabeçalho Fixo -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-lg">
+        <!-- Barra superior de acessibilidade -->
+        <div class="bg-gray-800 text-white py-2">
+            <div class="container mx-auto px-6">
                 <div class="flex justify-between items-center text-sm">
                     <div class="flex space-x-4">
-                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                        <button id="accessibility-btn" class="hover:text-gray-300 transition-colors flex items-center">
+                            <i class="fas fa-universal-access mr-1"></i>
                             Acessibilidade
+                        </button>
+                        <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
+                            <i class="fas fa-phone mr-1"></i>
+                            Contato
                         </a>
                         <a href="#" class="hover:text-gray-300 transition-colors flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                            </svg>
-                            Contato
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Sobre
                         </a>
                     </div>
                     <div class="flex space-x-4">
-                        <button class="hover:text-gray-300 transition-colors">A+</button>
-                        <button class="hover:text-gray-300 transition-colors">A-</button>
-                        <button class="hover:text-gray-300 transition-colors">Alto Contraste</button>
+                        <span class="text-gray-300">{{ now()->format('d/m/Y') }}</span>
+                        <div class="accessibility-controls hidden space-x-2">
+                            <button id="increase-font" class="hover:text-gray-300">A+</button>
+                            <button id="decrease-font" class="hover:text-gray-300">A-</button>
+                            <button id="high-contrast" class="hover:text-gray-300">Alto Contraste</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 2. Seção do logo e informações principais -->
-        <div class="bg-blue-800 text-white py-4">
-            <div class="container mx-auto px-4">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center">
-                        <a href="{{ route('portal.home') }}" class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
+
+        <!-- Header principal -->
+        <div class="bg-white border-b border-gray-200 py-4">
+            <div class="container mx-auto px-6">
+                <div class="flex items-center justify-between">
+                    <!-- Logo e Nome -->
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('home') }}" class="flex items-center space-x-3">
+                            <div class="bg-blue-600 p-2 rounded-lg">
+                                <i class="fas fa-newspaper text-white text-2xl"></i>
+                            </div>
                             <div>
-                                <div class="text-2xl font-bold">Diário Oficial</div>
-                                <div class="text-sm text-blue-200">Publicações Oficiais</div>
+                                <h1 class="text-xl font-bold text-gray-900">Diário Oficial</h1>
+                                <p class="text-sm text-gray-600">Prefeitura Municipal</p>
                             </div>
                         </a>
                     </div>
-                    
-                    <div class="hidden md:flex items-center space-x-4">
-                        <div class="text-right">
-                            <div class="text-sm text-blue-200">{{ now()->format('l, d \de F \de Y') }}</div>
-                            <div class="text-xs">Última atualização: {{ now()->format('H:i') }}</div>
-                        </div>
-                        @auth
-                            <a href="{{ route('dashboard') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
-                                Área Administrativa
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="bg-white text-blue-800 px-4 py-2 rounded-md hover:bg-blue-100 transition-colors">
-                                Login
-                            </a>
-                        @endauth
+
+                    <!-- Barra de Busca Global -->
+                    <div class="flex-1 max-w-2xl mx-8">
+                        <form action="{{ route('home.buscar') }}" method="GET" class="relative">
+                            <input type="text" 
+                                   name="q" 
+                                   placeholder="Buscar por palavra-chave, número da edição ou data..."
+                                   value="{{ request('q') }}"
+                                   class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500">
+                            <button type="submit" 
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
                     </div>
+
+                    <!-- Menu rápido -->
+                    <nav class="flex items-center space-x-6">
+                        <a href="{{ route('home') }}" 
+                           class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 {{ request()->routeIs('home') ? 'text-blue-600 font-semibold' : '' }}">
+                            Início
+                        </a>
+                        <a href="{{ route('portal.materias.index') }}" 
+                           class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 {{ request()->routeIs('portal.materias.*') ? 'text-blue-600 font-semibold' : '' }}">
+                            Matérias
+                        </a>
+                        <a href="{{ route('portal.edicoes.index') }}" 
+                           class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 {{ request()->routeIs('portal.edicoes.*') ? 'text-blue-600 font-semibold' : '' }}">
+                            Edições
+                        </a>
+                        <div class="relative dropdown">
+                            <button class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 flex items-center">
+                                Regulamentações
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Decretos</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Portarias</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Leis</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Editais</a>
+                            </div>
+                        </div>
+                    </nav>
                 </div>
-            </div>
-        </div>
-        
-        <!-- 3. Barra de navegação principal -->
-        <div class="bg-blue-700 shadow-md">
-            <div class="container mx-auto px-4">
-                <!-- Menu de navegação desktop -->
-                <nav class="hidden md:flex items-center py-3">
-                    <a href="{{ route('portal.home') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
-                        Início
-                    </a>
-                    <a href="{{ route('portal.edicoes.index') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
-                        Edições
-                    </a>
-                    <a href="{{ route('portal.materias.index') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
-                        Matérias
-                    </a>
-                    <a href="{{ route('portal.verificar') }}" class="text-white hover:text-blue-200 transition-colors px-4 py-1 font-medium">
-                        Verificar Autenticidade
-                    </a>
-                </nav>
-                
-                <!-- Menu móvel toggle -->
-                <div class="md:hidden py-2 flex justify-end">
-                    <button id="menu-toggle" class="text-white focus:outline-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Menu móvel expansível -->
-            <div id="mobile-menu" class="hidden md:hidden container mx-auto px-4 py-2 bg-blue-700">
-                <a href="{{ route('portal.edicoes.index') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md">
-                    Edições
-                </a>
-                <a href="{{ route('portal.materias.index') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md">
-                    Matérias
-                </a>
-                <a href="{{ route('portal.verificar') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md">
-                    Verificar Autenticidade
-                </a>
-                
-                @auth
-                    <a href="{{ route('dashboard') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md mt-2">
-                        Área Administrativa
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" class="block text-white hover:bg-blue-700 px-2 py-2 rounded-md mt-2">
-                        Login
-                    </a>
-                @endauth
             </div>
         </div>
     </header>
 
-    <!-- Conteúdo principal -->
-    <main class="flex-1">
+    <!-- Conteúdo principal com espaçamento para compensar header fixo -->
+    <main class="flex-1" style="margin-top: 8rem;">
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                <i class="fas fa-check-circle mr-2"></i>
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
             <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <i class="fas fa-exclamation-circle mr-2"></i>
                 {{ session('error') }}
             </div>
         @endif
-
-        <!-- Breadcrumbs -->
-        <div class="bg-white border-b">
-            <div class="container mx-auto px-4 py-2">
-                <nav class="flex" aria-label="Breadcrumb">
-                    <ol class="inline-flex items-center space-x-1 md:space-x-3 text-sm">
-                        <li class="inline-flex items-center">
-                            <a href="{{ route('portal.home') }}" class="text-gray-700 hover:text-blue-600 inline-flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                                </svg>
-                                Início
-                            </a>
-                        </li>
-                        @yield('breadcrumbs')
-                    </ol>
-                </nav>
-            </div>
-        </div>
 
         @yield('content')
     </main>
 
     <!-- Rodapé -->
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-lg font-semibold mb-3">Diário Oficial</h3>
-                    <p class="text-gray-300 text-sm">
-                        Publicação oficial dos atos normativos e administrativos.
-                    </p>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-3">Links Úteis</h3>
-                    <ul class="space-y-2">
-                        <li>
-                            <a href="{{ route('portal.edicoes.index') }}" class="text-gray-300 hover:text-white text-sm">
-                                Edições
+    <footer class="bg-gray-900 text-white mt-16">
+        <!-- Seção principal do rodapé -->
+        <div class="bg-gray-800 py-12">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Sobre o Diário -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-newspaper mr-2 text-blue-400"></i>
+                            Diário Oficial
+                        </h3>
+                        <p class="text-gray-300 text-sm mb-4">
+                            Publicação oficial dos atos administrativos da Prefeitura Municipal, 
+                            garantindo transparência e acesso à informação pública.
+                        </p>
+                        <div class="flex space-x-3">
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <i class="fab fa-facebook-f"></i>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('portal.verificar') }}" class="text-gray-300 hover:text-white text-sm">
-                                Verificar Autenticidade
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <i class="fab fa-twitter"></i>
                             </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-semibold mb-3">Contato</h3>
-                    <p class="text-gray-300 text-sm">
-                        contato@diariooficial.gov.br
-                    </p>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Links Rápidos -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Links Rápidos</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white transition-colors">Início</a></li>
+                            <li><a href="{{ route('portal.edicoes.index') }}" class="text-gray-300 hover:text-white transition-colors">Todas as Edições</a></li>
+                            <li><a href="{{ route('portal.materias.index') }}" class="text-gray-300 hover:text-white transition-colors">Matérias</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Verificar Autenticidade</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Arquivo Histórico</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Regulamentações -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Regulamentações</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Decretos</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Portarias</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Leis Municipais</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Editais</a></li>
+                            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Resoluções</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contato -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Contato</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start space-x-2">
+                                <i class="fas fa-map-marker-alt text-blue-400 mt-1"></i>
+                                <div>
+                                    <p class="text-gray-300">Prefeitura Municipal</p>
+                                    <p class="text-gray-400">Rua Principal, 123</p>
+                                    <p class="text-gray-400">Centro - CEP: 12345-678</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-phone text-blue-400"></i>
+                                <span class="text-gray-300">(11) 1234-5678</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-envelope text-blue-400"></i>
+                                <span class="text-gray-300">contato@prefeitura.gov.br</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-clock text-blue-400"></i>
+                                <span class="text-gray-300">Seg-Sex: 8h às 17h</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400 text-sm">
-                &copy; {{ date('Y') }} Diário Oficial. Todos os direitos reservados.
+        </div>
+
+        <!-- Barra inferior do rodapé -->
+        <div class="bg-gray-900 py-4 border-t border-gray-700">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-gray-400 text-sm mb-2 md:mb-0">
+                        © {{ date('Y') }} Prefeitura Municipal. Todos os direitos reservados.
+                    </div>
+                    <div class="flex space-x-4 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Política de Privacidade</a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Termos de Uso</a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Acessibilidade</a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Mapa do Site</a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
+    @stack('scripts')
+
     <script>
-        // Menu móvel toggle
-        document.getElementById('menu-toggle').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+        // Funcionalidade de acessibilidade
+        document.getElementById('accessibility-btn')?.addEventListener('click', function() {
+            const controls = document.querySelector('.accessibility-controls');
+            controls.classList.toggle('hidden');
+        });
+
+        // Controle de fonte
+        let currentFontSize = 16;
+        document.getElementById('increase-font')?.addEventListener('click', function() {
+            currentFontSize += 2;
+            document.body.style.fontSize = currentFontSize + 'px';
+        });
+
+        document.getElementById('decrease-font')?.addEventListener('click', function() {
+            if (currentFontSize > 12) {
+                currentFontSize -= 2;
+                document.body.style.fontSize = currentFontSize + 'px';
+            }
+        });
+
+        // Alto contraste
+        document.getElementById('high-contrast')?.addEventListener('click', function() {
+            document.body.classList.toggle('high-contrast');
+        });
+
+        // Dropdown do menu
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            const button = dropdown.querySelector('button');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            button?.addEventListener('click', function(e) {
+                e.preventDefault();
+                menu.classList.toggle('hidden');
+            });
+            
+            // Fechar dropdown ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Busca por enter
+        document.querySelector('form input[name="q"]')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.form.submit();
+            }
         });
     </script>
-    
-    @stack('scripts')
 </body>
 </html>

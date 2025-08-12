@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Portal\EdicaoController as PortalEdicaoController;
 use App\Http\Controllers\Portal\MateriaController as PortalMateriaController;
 use App\Http\Controllers\Admin\EdicaoController;
@@ -22,12 +23,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Rotas Públicas
-Route::get('/', [PortalEdicaoController::class, 'index'])->name('portal.home');
+// Rota da Home Principal
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/buscar', [HomeController::class, 'buscar'])->name('home.buscar');
+
+// Rotas Públicas do Portal
 Route::prefix('diario')->group(function () {
     // Edições
     Route::get('/edicoes', [PortalEdicaoController::class, 'index'])->name('portal.edicoes.index');
     Route::get('/edicoes/{edicao}', [PortalEdicaoController::class, 'show'])->name('portal.edicoes.show');
+    Route::post('/edicoes/{edicao}/view', [PortalEdicaoController::class, 'registerView'])->name('portal.edicoes.view');
     Route::get('/edicoes/{edicao}/materias', [PortalEdicaoController::class, 'materias'])->name('portal.edicoes.materias');
     Route::get('/edicoes/{edicao}/pdf', [PortalEdicaoController::class, 'pdf'])->name('portal.edicoes.pdf');
     

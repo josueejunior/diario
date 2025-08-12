@@ -15,16 +15,16 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="flex h-screen bg-gray-100">
+        <div class="flex h-screen bg-enhanced">
             <!-- Sidebar -->
-            <aside class="z-20 hidden w-64 overflow-y-auto bg-white md:block flex-shrink-0">
+            <aside class="z-20 hidden w-64 overflow-y-auto bg-white paper-effect md:block flex-shrink-0">
                 <x-admin-sidebar />
             </aside>
             
             <!-- Mobile sidebar -->
             <div x-data="{ isSideMenuOpen: false }" class="flex flex-col flex-1 w-full">
-                <header class="z-10 py-4 bg-white shadow-md md:hidden">
-                    <div class="flex items-center justify-between h-full px-6">
+                <header class="z-10 py-4 bg-white shadow-md paper-effect md:hidden">
+                    <div class="flex items-center justify-between h-full px-6 relative z-10">
                         <button
                             @click="isSideMenuOpen = !isSideMenuOpen"
                             class="p-1 mr-5 -ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-purple"
