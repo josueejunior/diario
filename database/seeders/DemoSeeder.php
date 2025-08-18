@@ -79,6 +79,108 @@ class DemoSeeder extends Seeder
                     'tamanho' => rand(1000000, 5000000)
                 ]
             );
+            
+            // Criar arquivo PDF fake se não existir
+            $caminhoCompleto = storage_path('app/public/' . $edicao->caminho_arquivo);
+            $diretorio = dirname($caminhoCompleto);
+            if (!file_exists($diretorio)) {
+                mkdir($diretorio, 0755, true);
+            }
+            if (!file_exists($caminhoCompleto)) {
+                // Criar um PDF simples mas válido
+                $pdfContent = '%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(Edição ' . $edicao->numero . ' - ' . $edicao->data->format('d/m/Y') . ') Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000010 00000 n 
+0000000053 00000 n 
+0000000125 00000 n 
+0000000221 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+314
+%%EOF';
+                file_put_contents($caminhoCompleto, $pdfContent);
+            }
+            
+            // Criar assinatura para a edição
+            \App\Models\Assinatura::firstOrCreate(
+                ['edicao_id' => $edicao->id],
+                [
+                    'signatario' => 'Elaine Maria Ferreira Costa',
+                    'ac' => 'AC SAFEWEB RFB v5',
+                    'algoritmo' => 'SHA-256 with RSA',
+                    'hash' => hash('sha256', 'edicao_' . $edicao->numero . '_' . $edicao->data->format('Y-m-d')),
+                    'carimbo_tempo' => $edicao->carimbo_tempo ?? now(),
+                    'signed_by' => $admin->id,
+                    'cadeia_certificados' => [
+                        'certificado_principal' => 'CN=Elaine Maria Ferreira Costa',
+                        'autoridade_certificadora' => 'AC SAFEWEB RFB v5',
+                        'validade' => now()->addYear()->toISOString()
+                    ]
+                ]
+            );
+            
+            // Criar algumas visualizações e downloads para estatísticas
+            for ($v = 0; $v < rand(20, 100); $v++) {
+                \App\Models\Visualizacao::create([
+                    'edicao_id' => $edicao->id,
+                    'ip' => '192.168.' . rand(1, 255) . '.' . rand(1, 255),
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'created_at' => now()->subDays(rand(0, 30))
+                ]);
+            }
+            
+            for ($d = 0; $d < rand(5, 30); $d++) {
+                \App\Models\Download::create([
+                    'edicao_id' => $edicao->id,
+                    'ip' => '192.168.' . rand(1, 255) . '.' . rand(1, 255),
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'created_at' => now()->subDays(rand(0, 30))
+                ]);
+            }
+            
             $edicoes[] = $edicao;
         }
         

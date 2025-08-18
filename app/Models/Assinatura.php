@@ -21,7 +21,8 @@ class Assinatura extends Model
         'algoritmo',
         'hash',
         'carimbo_tempo',
-        'cadeia_certificados'
+        'cadeia_certificados',
+        'signed_by'
     ];
 
     /**

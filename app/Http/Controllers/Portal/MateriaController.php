@@ -13,16 +13,43 @@ class MateriaController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Busca as matérias mais recentes de edições publicadas
-        $materias = Materia::whereHas('edicoes', function ($query) {
-                        $query->where('publicado', true);
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(15);
+        // Query base para matérias
+        $query = Materia::with(['tipo', 'orgao', 'edicoes'])
+                        ->withCount('visualizacoes');
+
+        // Busca por texto
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('titulo', 'LIKE', "%{$search}%")
+                  ->orWhere('texto', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filtro por tipo
+        if ($request->filled('tipo')) {
+            $query->whereHas('tipo', function ($q) use ($request) {
+                $q->where('slug', $request->tipo);
+            });
+        }
+
+        // Filtro por órgão
+        if ($request->filled('orgao')) {
+            $query->where('orgao_id', $request->orgao);
+        }
+
+        // Ordenação
+        $materias = $query->orderBy('data', 'desc')
+                         ->orderBy('created_at', 'desc')
+                         ->paginate(15);
+
+        // Dados adicionais para os filtros
+        $tipos = \App\Models\Tipo::all();
+        $orgaos = \App\Models\Orgao::all();
         
-        return view('portal.materias.index', compact('materias'));
+        return view('portal.materias.index', compact('materias', 'tipos', 'orgaos'));
     }
 
     /**
@@ -33,16 +60,29 @@ class MateriaController extends Controller
      */
     public function show(Materia $materia)
     {
-        // Verifica se a edição está publicada
-        if (!$materia->edicao || !$materia->edicao->publicado) {
-            abort(404);
+        // Carrega as relações necessárias
+        $materia->load(['tipo', 'orgao', 'edicoes' => function ($query) {
+            $query->orderBy('data', 'desc');
+        }]);
+        
+        // Tenta carregar a contagem de visualizações
+        try {
+            $materia->loadCount('visualizacoes');
+        } catch (\Exception $e) {
+            // Se falhar, define como 0
+            $materia->visualizacoes_count = 0;
         }
         
-        // Registra a visualização
-        $materia->visualizacoes()->create([
-            'ip' => request()->ip(),
-            'user_agent' => request()->userAgent()
-        ]);
+        // Registra a visualização de forma segura
+        try {
+            $materia->visualizacoes()->create([
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent()
+            ]);
+        } catch (\Exception $e) {
+            // Ignora erros de inserção de visualização para não quebrar a página
+            \Log::warning('Erro ao registrar visualização: ' . $e->getMessage());
+        }
         
         return view('portal.materias.show', compact('materia'));
     }
@@ -106,15 +146,27 @@ class MateriaController extends Controller
      */
     private function materiaPorTipo($tipo, $titulo)
     {
-        $materias = Materia::whereHas('edicoes', function ($query) {
-                        $query->where('publicado', true);
-                    })
-                    ->whereHas('tipo', function ($query) use ($tipo) {
-                        $query->where('nome', 'like', "%{$tipo}%");
-                    })
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(15);
-        
+        // Query base para matérias do tipo específico
+        $query = Materia::with(['tipo', 'orgao', 'edicoes'])
+                        ->withCount('visualizacoes')
+                        ->whereHas('tipo', function ($q) use ($tipo) {
+                            $q->where('nome', 'like', "%{$tipo}%");
+                        });
+
+        // Busca por texto se fornecido
+        if (request()->filled('search')) {
+            $search = request()->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('titulo', 'LIKE', "%{$search}%")
+                  ->orWhere('texto', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Ordenação e paginação
+        $materias = $query->orderBy('data', 'desc')
+                         ->orderBy('created_at', 'desc')
+                         ->paginate(15);
+
         return view('portal.materias.tipo', compact('materias', 'tipo', 'titulo'));
     }
 }

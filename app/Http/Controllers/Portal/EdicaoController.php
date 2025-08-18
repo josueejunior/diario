@@ -18,15 +18,18 @@ class EdicaoController extends Controller
      */
     public function index()
     {
-        // Busca as edições mais recentes
-        $edicoes = Edicao::orderBy('data_publicacao', 'desc')
-                         ->where('publicado', true)
+        // Busca as edições mais recentes com suas matérias
+        $edicoes = Edicao::with(['materias'])
+                         ->withCount(['visualizacoes', 'downloads', 'materias'])
+                         ->orderBy('data', 'desc')
+                         ->orderBy('created_at', 'desc')
                          ->paginate(10);
         
-        // Obtém a edição mais recente para exibição do PDF com contadores
-        $edicaoRecente = Edicao::where('publicado', true)
-                               ->orderBy('data_publicacao', 'desc')
-                               ->withCount('visualizacoes', 'downloads')
+        // Obtém a edição mais recente para exibição em destaque
+        $edicaoRecente = Edicao::with(['materias'])
+                               ->withCount(['visualizacoes', 'downloads', 'materias'])
+                               ->orderBy('data', 'desc')
+                               ->orderBy('created_at', 'desc')
                                ->first();
         
         // Obtém as datas das edições do mês atual para o calendário
@@ -34,9 +37,8 @@ class EdicaoController extends Controller
         $primeiroDiaMes = $dataAtual->copy()->startOfMonth();
         $ultimoDiaMes = $dataAtual->copy()->endOfMonth();
         
-        $datasEdicoes = Edicao::where('publicado', true)
-                            ->whereBetween('data_publicacao', [$primeiroDiaMes, $ultimoDiaMes])
-                            ->pluck('data_publicacao')
+        $datasEdicoes = Edicao::whereBetween('data', [$primeiroDiaMes, $ultimoDiaMes])
+                            ->pluck('data')
                             ->map(function($data) {
                                 return $data->format('Y-m-d');
                             })
@@ -49,9 +51,8 @@ class EdicaoController extends Controller
             $primeiroDiaMesAnterior = $mesAnterior->copy()->startOfMonth();
             $ultimoDiaMesAnterior = $mesAnterior->copy()->endOfMonth();
             
-            $edicoesAnteriores = Edicao::where('publicado', true)
-                ->whereBetween('data_publicacao', [$primeiroDiaMesAnterior, $ultimoDiaMesAnterior])
-                ->pluck('data_publicacao', 'id')
+            $edicoesAnteriores = Edicao::whereBetween('data', [$primeiroDiaMesAnterior, $ultimoDiaMesAnterior])
+                ->pluck('data', 'id')
                 ->map(function($data) {
                     return $data->format('Y-m-d');
                 })
@@ -71,6 +72,10 @@ class EdicaoController extends Controller
      */
     public function show(Edicao $edicao)
     {
+        // Carrega as matérias e relacionamentos necessários
+        $edicao->load(['materias.tipo', 'materias.orgao']);
+        $edicao->loadCount(['visualizacoes', 'downloads', 'materias']);
+        
         return view('portal.edicoes.show', compact('edicao'));
     }
     
@@ -82,7 +87,10 @@ class EdicaoController extends Controller
      */
     public function materias(Edicao $edicao)
     {
-        $materias = $edicao->materias()->paginate(15);
+        $materias = $edicao->materias()
+                          ->with(['tipo', 'orgao'])
+                          ->withCount('visualizacoes')
+                          ->paginate(15);
         
         return view('portal.edicoes.materias', compact('edicao', 'materias'));
     }

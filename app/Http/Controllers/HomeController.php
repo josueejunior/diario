@@ -13,14 +13,20 @@ use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Mês e ano para o calendário (padrão: atual)
+        $mesCalendario = $request->get('mes', Carbon::now()->month);
+        $anoCalendario = $request->get('ano', Carbon::now()->year);
+        $dataCalendario = Carbon::createFromDate($anoCalendario, $mesCalendario, 1);
+        
         // Última edição publicada (para o novo design será a edicaoRecente)
         $edicaoRecente = Edicao::with(['assinatura', 'assinaturas', 'visualizacoes', 'downloads'])
+            ->withCount(['visualizacoes', 'downloads', 'materias'])
             ->orderBy('data', 'desc')
             ->first();
         
-        // Edições recentes para a lista
+        // Edições recentes para a lista (com contagem de relacionamentos)
         $edicoesRecentes = Edicao::withCount(['materias', 'visualizacoes', 'downloads'])
             ->orderBy('data', 'desc')
             ->limit(10)
@@ -39,13 +45,13 @@ class HomeController extends Controller
             'total_materias' => Materia::where('status', 'aprovado')->count(),
             'total_visualizacoes' => Visualizacao::count(),
             'total_downloads' => Download::count(),
-            'visualizacoes_edicao_recente' => $edicaoRecente ? $edicaoRecente->visualizacoes()->count() : 0,
-            'downloads_edicao_recente' => $edicaoRecente ? $edicaoRecente->downloads()->count() : 0,
+            'visualizacoes_edicao_recente' => $edicaoRecente ? $edicaoRecente->visualizacoes_count : 0,
+            'downloads_edicao_recente' => $edicaoRecente ? $edicaoRecente->downloads_count : 0,
         ];
         
         // Estatísticas antigas para compatibilidade
         $totalEdicoes = $stats['total_edicoes'];
-        $materiasEdicaoAtual = $edicaoRecente ? $edicaoRecente->materias()->count() : 0;
+        $materiasEdicaoAtual = $edicaoRecente ? $edicaoRecente->materias_count : 0;
         
         // Downloads mais populares (últimos 30 dias)
         $downloadsPopulares = Download::with(['edicao'])
@@ -69,8 +75,9 @@ class HomeController extends Controller
             ->sortDesc()
             ->take(5);
         
-        // Calendário - edições dos últimos 30 dias
-        $edicoesCalendario = Edicao::where('data', '>=', Carbon::now()->subDays(30))
+        // Calendário - edições do mês selecionado
+        $edicoesCalendario = Edicao::whereMonth('data', $mesCalendario)
+            ->whereYear('data', $anoCalendario)
             ->orderBy('data', 'desc')
             ->get()
             ->groupBy(function ($edicao) {
@@ -90,7 +97,8 @@ class HomeController extends Controller
             'downloadsPopulares',
             'secoesPopulares',
             'edicoesCalendario',
-            'ultimaEdicao'
+            'ultimaEdicao',
+            'dataCalendario'
         ));
     }
     

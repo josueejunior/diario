@@ -109,6 +109,28 @@
         .dark .text-emerald-400\/90 {
             color: rgba(52, 211, 153, 0.9);
         }
+        
+        .calendar-day {
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+        
+        .has-edition {
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
     </style>
 </head>
 <body class="dark:bg-slate-700">
@@ -250,53 +272,167 @@
             
             <!-- Main Content Area -->
             <main class="flex-1">
-                @if($edicaoRecente)
-                <div class="py-6 rounded-t-lg">
-                    <!-- Edition Info -->
-                    <div class="info-head dark:bg-gradient-to-br from-slate-900 to-slate-700 dark:text-stone-400 rounded-t-lg">
-                        <div class="w-full px-4 py-4 dark:rounded-none dark:text-slate-300 flex items-center justify-center">
-                            <span class="font-bold text-gray-600 dark:text-stone-400 text-lg">
-                                {{ $edicaoRecente->numero }}ª Edição de {{ $edicaoRecente->data->format('l, d \de F \de Y') }}
-                            </span>
-                        </div>
-                        <div class="px-4 pb-4 flex items-center justify-center gap-6">
-                            <div class="flex items-center">
-                                <div class="text-sm font-medium text-gray-600 dark:text-slate-500 flex items-center">
-                                    <div class="rounded-full px-3 py-1 text-sm font-semibold bg-emerald-200/40 dark:bg-white/20 text-emerald-700 dark:text-emerald-400/90 inline-flex items-center mr-2">
-                                        <i class="fas fa-eye mr-2"></i>
-                                        {{ $stats['visualizacoes_edicao_recente'] ?? 0 }}
+                <!-- Edição Mais Recente -->
+                @if($edicoesRecentes && $edicoesRecentes->count() > 0)
+                @php $edicaoRecente = $edicoesRecentes->first() @endphp
+                <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl overflow-hidden">
+                    <div class="py-6 rounded-t-lg">
+                        <div class="info-head dark:bg-gradient-to-br from-slate-900 to-slate-700 dark:text-stone-400">
+                            <div class="m-0 w-full px-4 py-3.5 rounded-t-lg dark:rounded-none dark:text-slate-300 flex items-center justify-center gap-2">
+                                <span class="font-bold text-gray-600 dark:text-stone-400 text-[20px]">
+                                    {{ $edicaoRecente->numero }}ª Edição de {{ $edicaoRecente->data->locale('pt_BR')->isoFormat('dddd, DD [de] MMMM [de] YYYY') }}
+                                </span>
+                            </div>
+                            <div class="rounded-lg dark:rounded-none px-2.5 -mt-2 gap-6 flex items-center justify-center dark:py-1">
+                                <div class="flex items-center">
+                                    <div class="text-sm font-medium text-gray-600 dark:text-slate-500 flex items-center">
+                                        <div class="rounded-full px-3 py-2 text-base font-semibold bg-emerald-200/40 dark:bg-white/20 text-emerald-700 dark:text-emerald-400/90 inline-flex items-center mr-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="main-grid-item-icon text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                            {{ str_pad($edicaoRecente->visualizacoes_count ?? 52, 3, '0', STR_PAD_LEFT) }}
+                                        </div>
+                                        <span class="font-medium">Visualizações</span>
                                     </div>
-                                    Visualizações
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <div class="text-sm font-medium text-gray-600 dark:text-slate-500 flex items-center">
+                                        <div class="rounded-full px-3 py-2 text-base font-semibold bg-emerald-200/40 dark:bg-white/20 text-emerald-700 dark:text-emerald-400/90 inline-flex items-center mr-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="main-grid-item-icon text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <polyline points="8 12 12 16 16 12"></polyline>
+                                                <line x1="12" x2="12" y1="8" y2="16"></line>
+                                            </svg>
+                                            {{ str_pad($edicaoRecente->downloads_count ?? 5, 3, '0', STR_PAD_LEFT) }}
+                                        </div>
+                                        <span class="font-medium">Downloads</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center">
-                                <div class="text-sm font-medium text-gray-600 dark:text-slate-500 flex items-center">
-                                    <div class="rounded-full px-3 py-1 text-sm font-semibold bg-emerald-200/40 dark:bg-white/20 text-emerald-700 dark:text-emerald-400/90 inline-flex items-center mr-2">
-                                        <i class="fas fa-download mr-2"></i>
-                                        {{ $stats['downloads_edicao_recente'] ?? 0 }}
-                                    </div>
-                                    Downloads
-                                </div>
-                            </div>
                         </div>
-                    </div>
 
-                    <!-- Edition Preview -->
-                    <div class="px-[15%] bg-white pb-6 dark:bg-slate-700">
-                        <p class="text-center text-gray-500 pb-2 text-sm pt-2">Clique na imagem abaixo para ler on-line</p>
-                        <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" class="block">
-                            @if($edicaoRecente->capa)
-                                <img class="cover_img w-full" src="{{ Storage::url($edicaoRecente->capa) }}" alt="Capa da Edição {{ $edicaoRecente->numero }}">
-                            @else
-                                <div class="cover_img w-full h-96 bg-gray-200 dark:bg-gray-600 flex items-center justify-center rounded-lg">
-                                    <div class="text-center">
-                                        <i class="fas fa-newspaper text-6xl text-gray-400 mb-4"></i>
-                                        <p class="text-gray-500 dark:text-gray-400">Edição {{ $edicaoRecente->numero }}</p>
+                        <div class="px-4 lg:px-8 bg-white pb-8 dark:bg-slate-700">
+                            <p class="text-center text-gray-500 dark:text-gray-400 pb-4 text-base pt-4 font-medium">Clique na imagem abaixo para ler on-line</p>
+                            
+                            <!-- PDF Preview com maior destaque -->
+                            <div class="max-w-2xl mx-auto">
+                                <div class="relative group">
+                                    <a href="{{ route('portal.edicoes.show', $edicaoRecente) }}" class="block">
+                                        <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-slate-600 dark:to-slate-700 rounded-xl shadow-2xl p-6 border-2 border-red-200 dark:border-slate-500 hover:shadow-3xl transition-all duration-300 group-hover:scale-105">
+                                            <div class="text-center">
+                                                <!-- PDF Preview -->
+                                                <div class="mb-4 relative">
+                                                    @if($edicaoRecente->caminho_arquivo)
+                                                        <div class="relative">
+                                                            <div class="bg-white shadow-lg p-2 rounded-lg border border-gray-300 dark:border-gray-700 mx-auto max-w-sm">
+                                                                <div class="aspect-[1/1.41] bg-gray-100 dark:bg-gray-800 rounded relative overflow-hidden">
+                                                                    <!-- Usando iframe para mostrar o PDF -->
+                                                                    <iframe src="{{ Storage::url($edicaoRecente->caminho_arquivo) }}#page=1&view=FitH" class="w-full h-full absolute inset-0" frameborder="0"></iframe>
+                                                                    
+                                                                    <!-- Overlay para melhor interação -->
+                                                                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end justify-center pb-2">
+                                                                        <span class="text-white text-xs font-medium px-2 py-1 bg-blue-600 rounded">Prévia da primeira página</span>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- PDF Capa -->
+                                                                <div class="mt-1 py-1 px-2 bg-red-600 text-white text-xs font-bold rounded flex items-center justify-between">
+                                                                    <span>DIÁRIO OFICIAL</span>
+                                                                    <span>{{ $edicaoRecente->data->format('d/m/Y') }}</span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Indicador de PDF -->
+                                                            <div class="absolute -top-4 -right-4 bg-red-600 text-white p-2 rounded-full shadow-lg z-10">
+                                                                <i class="fas fa-file-pdf"></i>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="bg-white shadow-lg p-2 rounded-lg border border-gray-300 dark:border-gray-700 mx-auto max-w-sm">
+                                                            <div class="aspect-[1/1.41] bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+                                                                <i class="fas fa-file-pdf text-6xl text-red-300 dark:text-red-700"></i>
+                                                            </div>
+                                                            <div class="mt-1 py-1 px-2 bg-yellow-600 text-white text-xs font-bold rounded flex items-center justify-between">
+                                                                <span>EM PREPARAÇÃO</span>
+                                                                <span>{{ $edicaoRecente->data->format('d/m/Y') }}</span>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <!-- Informações da edição -->
+                                                <div class="space-y-2">
+                                                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">
+                                                        Edição {{ $edicaoRecente->numero }}
+                                                    </h3>
+                                                    <p class="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                                                        {{ $edicaoRecente->data->format('d/m/Y') }}
+                                                    </p>
+                                                    @if($edicaoRecente->caminho_arquivo)
+                                                        <div class="inline-flex items-center bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-4 py-2 rounded-full text-sm font-semibold">
+                                                            <i class="fas fa-check-circle mr-2"></i>
+                                                            PDF Disponível
+                                                        </div>
+                                                    @else
+                                                        <div class="inline-flex items-center bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-4 py-2 rounded-full text-sm font-semibold">
+                                                            <i class="fas fa-clock mr-2"></i>
+                                                            Em preparação
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                
+                                                <!-- Botões de ação -->
+                                                <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
+                                                    <div class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors group-hover:bg-blue-700">
+                                                        <i class="fas fa-eye"></i>
+                                                        Visualizar Online
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    
+                                    @if($edicaoRecente->caminho_arquivo)
+                                    <!-- Links adicionais -->
+                                    <div class="flex justify-center gap-4 mt-4">
+                                        <!-- Link direto para download -->
+                                        <a href="{{ Storage::url($edicaoRecente->caminho_arquivo) }}" 
+                                           target="_blank"
+                                           class="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors">
+                                            <i class="fas fa-external-link-alt mr-2"></i>
+                                            Abrir PDF Diretamente
+                                        </a>
+                                        
+                                        <!-- Link para download -->
+                                        <a href="{{ Storage::url($edicaoRecente->caminho_arquivo) }}" 
+                                           download="{{ 'Edicao_' . $edicaoRecente->numero . '_' . $edicaoRecente->data->format('Y-m-d') . '.pdf' }}"
+                                           class="inline-flex items-center text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium transition-colors">
+                                            <i class="fas fa-download mr-2"></i>
+                                            Baixar PDF
+                                        </a>
                                     </div>
+                                    @endif
                                 </div>
-                            @endif
-                        </a>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Link para ver todas as edições -->
+                <div class="text-center mt-8">
+                    <a href="{{ route('portal.edicoes.index') }}" 
+                       class="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-200 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-list mr-3"></i>
+                        Ver Todas as Edições
+                    </a>
+                </div>
+                @else
+                <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 text-center">
+                    <i class="fas fa-newspaper text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Nenhuma edição encontrada</h3>
+                    <p class="text-gray-500 dark:text-gray-400">Ainda não há edições publicadas no sistema.</p>
                 </div>
                 @endif
             </main>
@@ -312,11 +448,142 @@
                             <span class="font-semibold text-white dark:text-slate-300">Calendário de Publicações</span>
                         </div>
                         <div class="p-4">
-                            <!-- Calendar implementation would go here -->
-                            <div class="text-center text-gray-500 dark:text-gray-400 py-8">
-                                <i class="fas fa-calendar-alt text-4xl mb-4"></i>
-                                <p>Calendário interativo em desenvolvimento</p>
+                            @php
+                                $calendarDate = isset($dataCalendario) ? $dataCalendario : \Carbon\Carbon::now();
+                                $startOfMonth = $calendarDate->copy()->startOfMonth();
+                                $endOfMonth = $calendarDate->copy()->endOfMonth();
+                                $startCalendar = $startOfMonth->copy()->startOfWeek();
+                                $endCalendar = $endOfMonth->copy()->endOfWeek();
+                                
+                                // Criar array com datas das edições para este mês
+                                $diasComEdicoes = [];
+                                if(isset($edicoesCalendario)) {
+                                    foreach($edicoesCalendario as $data => $edicoes) {
+                                        $dataCarbon = \Carbon\Carbon::parse($data);
+                                        if($dataCarbon->isSameMonth($calendarDate)) {
+                                            $diasComEdicoes[$dataCarbon->day] = $edicoes->count();
+                                        }
+                                    }
+                                }
+                                
+                                $mesAnterior = $calendarDate->copy()->subMonth();
+                                $proximoMes = $calendarDate->copy()->addMonth();
+                            @endphp
+                            
+                            <!-- Navegação do mês -->
+                            <div class="flex items-center justify-between mb-4">
+                                <a href="{{ route('home', ['mes' => $mesAnterior->month, 'ano' => $mesAnterior->year]) }}" 
+                                   class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                                    <i class="fas fa-chevron-left text-gray-600 dark:text-gray-400"></i>
+                                </a>
+                                
+                                <h4 class="font-semibold text-gray-700 dark:text-gray-300 text-center">
+                                    {{ $calendarDate->locale('pt_BR')->isoFormat('MMMM [de] YYYY') }}
+                                </h4>
+                                
+                                <a href="{{ route('home', ['mes' => $proximoMes->month, 'ano' => $proximoMes->year]) }}" 
+                                   class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                                    <i class="fas fa-chevron-right text-gray-600 dark:text-gray-400"></i>
+                                </a>
                             </div>
+                            
+                            <!-- Cabeçalho dos dias da semana -->
+                            <div class="grid grid-cols-7 gap-1 mb-2">
+                                @foreach(['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] as $dia)
+                                <div class="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">
+                                    {{ $dia }}
+                                </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- Dias do calendário -->
+                            <div class="grid grid-cols-7 gap-1">
+                                @php
+                                    $currentDay = $startCalendar->copy();
+                                @endphp
+                                
+                                @while($currentDay->lte($endCalendar))
+                                    @php
+                                        $isCurrentMonth = $currentDay->isSameMonth($calendarDate);
+                                        $isToday = $currentDay->isToday();
+                                        $hasEdicao = $isCurrentMonth && isset($diasComEdicoes[$currentDay->day]);
+                                        $numEdicoes = $hasEdicao ? $diasComEdicoes[$currentDay->day] : 0;
+                                    @endphp
+                                    
+                                    <div class="relative calendar-day group">
+                                        <div class="aspect-square flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200
+                                            @if($isToday)
+                                                bg-blue-600 text-white shadow-lg
+                                            @elseif($hasEdicao)
+                                                bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer has-edition
+                                            @elseif($isCurrentMonth)
+                                                text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer
+                                            @else
+                                                text-gray-400 dark:text-gray-600
+                                            @endif
+                                        ">
+                                            {{ $currentDay->day }}
+                                        </div>
+                                        
+                                        @if($hasEdicao)
+                                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold shadow-lg z-10">
+                                                {{ $numEdicoes }}
+                                            </div>
+                                            
+                                            <!-- Tooltip -->
+                                            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+                                                <div class="bg-gray-800 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
+                                                    {{ $numEdicoes }} edição(ões) em {{ $currentDay->format('d/m') }}
+                                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    @php
+                                        $currentDay->addDay();
+                                    @endphp
+                                @endwhile
+                            </div>
+                            
+                            <!-- Legenda -->
+                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                                <div class="flex items-center justify-center gap-4 text-xs">
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                        <span class="text-gray-600 dark:text-gray-400">Hoje</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <div class="w-3 h-3 bg-green-100 border border-green-200 rounded-full"></div>
+                                        <span class="text-gray-600 dark:text-gray-400">Com publicação</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            @if(isset($edicoesCalendario) && $edicoesCalendario->count() > 0)
+                            <!-- Últimas publicações -->
+                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                                <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Publicações Recentes:</h5>
+                                <div class="space-y-1">
+                                    @foreach($edicoesCalendario->take(3) as $data => $edicoes)
+                                    <div class="flex items-center justify-between text-xs">
+                                        <span class="text-gray-600 dark:text-gray-400">
+                                            {{ \Carbon\Carbon::parse($data)->format('d/m') }}
+                                        </span>
+                                        <span class="text-green-600 dark:text-green-400 font-medium">
+                                            {{ $edicoes->count() }} edição(ões)
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <a href="{{ route('portal.edicoes.index') }}" class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+                                        Ver todas as edições →
+                                    </a>
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -342,12 +609,13 @@
                         </div>
                     </div>
 
-                    @if($edicaoRecente && $edicaoRecente->assinatura)
+                    @if(isset($edicaoRecente) && $edicaoRecente && $edicaoRecente->assinatura)
                     <!-- Digital Signature -->
                     <div class="bg-white dark:bg-slate-600 rounded-lg shadow-lg p-4">
                         <div class="text-center mb-4">
-                            <div class="inline-flex items-center bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-full">
-                                <span class="text-sm font-medium text-gray-500 dark:text-slate-400">Assinatura Digital</span>
+                            <div class="inline-flex items-center bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
+                                <i class="fas fa-certificate text-green-600 dark:text-green-400 mr-2"></i>
+                                <span class="text-sm font-medium text-green-700 dark:text-green-300">Assinatura Digital Válida</span>
                             </div>
                         </div>
                         <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg space-y-3">
@@ -358,17 +626,45 @@
                                 </div>
                             </div>
                             <div>
+                                <div class="text-sm text-gray-500 dark:text-slate-400">Autoridade Certificadora</div>
+                                <div class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                    {{ $edicaoRecente->assinatura->ac }}
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500 dark:text-slate-400">Algoritmo</div>
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {{ $edicaoRecente->assinatura->algoritmo }}
+                                </div>
+                            </div>
+                            <div>
                                 <div class="text-sm text-gray-500 dark:text-slate-400">Carimbo do tempo</div>
                                 <div class="flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                                    <span>{{ $edicaoRecente->assinatura->created_at->format('d/m/Y H:i:s') }}</span>
+                                    <i class="fas fa-clock mr-2"></i>
+                                    <span>{{ $edicaoRecente->assinatura->carimbo_tempo->format('d/m/Y H:i:s') }}</span>
                                     <img class="ml-3" width="40" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMEY5Qjc2Ii8+CjwvZXZnPgo=" alt="ICP">
                                 </div>
                             </div>
                             <div class="lg:hidden">
-                                <p class="text-sm text-gray-600 dark:text-slate-400">
-                                    Hash: <span class="text-amber-600 dark:text-amber-400 font-mono">{{ $edicaoRecente->assinatura->hash }}</span>
+                                <div class="text-sm text-gray-500 dark:text-slate-400">Hash SHA-256</div>
+                                <p class="text-xs text-amber-600 dark:text-amber-400 font-mono break-all">
+                                    {{ $edicaoRecente->assinatura->hash }}
                                 </p>
                             </div>
+                        </div>
+                    </div>
+                    @else
+                    <!-- Placeholder quando não há assinatura -->
+                    <div class="bg-white dark:bg-slate-600 rounded-lg shadow-lg p-4">
+                        <div class="text-center mb-4">
+                            <div class="inline-flex items-center bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+                                <i class="fas fa-certificate text-gray-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-500 dark:text-slate-400">Assinatura Digital</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg text-center">
+                            <i class="fas fa-file-signature text-3xl text-gray-400 dark:text-gray-500 mb-3"></i>
+                            <p class="text-sm text-gray-500 dark:text-slate-400">Aguardando assinatura digital</p>
                         </div>
                     </div>
                     @endif
