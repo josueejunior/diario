@@ -5,6 +5,54 @@
 
 @section('content')
 <div class="container-fluid">
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ $stats['total_edicoes'] }}</h3>
+                    <p>Total de Edições</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ $stats['edicoes_rascunho'] }}</h3>
+                    <p>Rascunhos</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>{{ $stats['edicoes_prontas'] }}</h3>
+                    <p>Prontas</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ $stats['edicoes_publicadas'] }}</h3>
+                    <p>Publicadas</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -59,35 +107,63 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>22/08/2025</td>
-                                    <td>Nº 001/2025</td>
-                                    <td>
-                                        <span class="badge badge-info">5 matérias</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-warning">Diagramando</span>
-                                    </td>
-                                    <td>há 2 horas</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary" title="Editar Diagramação">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-success" title="Visualizar">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-info" title="Gerar PDF">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" title="Excluir">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <!-- Mais linhas aqui -->
+                                @forelse($edicoes as $edicao)
+                                    <tr>
+                                        <td>{{ $edicao->data ? $edicao->data->format('d/m/Y') : 'N/A' }}</td>
+                                        <td>{{ $edicao->numero ?? 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge badge-info">{{ $edicao->materias->count() }} matérias</span>
+                                        </td>
+                                        <td>
+                                            @if($edicao->publicado)
+                                                <span class="badge badge-success">Publicado</span>
+                                            @elseif($edicao->descricao)
+                                                <span class="badge badge-info">Pronto</span>
+                                            @else
+                                                <span class="badge badge-warning">Rascunho</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $edicao->updated_at->diffForHumans() }}</td>
+                                        <td>
+                                            @if(!$edicao->publicado)
+                                                <a href="{{ route('admin.diagramacao.edit', $edicao->id) }}" class="btn btn-sm btn-primary" title="Editar Diagramação">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            @endif
+                                            <a href="{{ route('admin.diagramacao.show', $edicao->id) }}" class="btn btn-sm btn-success" title="Visualizar">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @if($edicao->caminho_arquivo)
+                                                <a href="{{ asset($edicao->caminho_arquivo) }}" target="_blank" class="btn btn-sm btn-info" title="Gerar PDF">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                            @endif
+                                            @if(!$edicao->publicado)
+                                                <button class="btn btn-sm btn-danger" onclick="excluirEdicao({{ $edicao->id }})" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-info-circle"></i>
+                                                Nenhuma edição encontrada.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if($edicoes->hasPages())
+                        <div class="d-flex justify-content-center">
+                            {{ $edicoes->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -121,10 +197,16 @@
                     <div class="form-group">
                         <label>Matérias Aprovadas</label>
                         <select class="form-control select2" name="materias[]" multiple required>
-                            <option value="1">Portaria nº 001/2025 - Nomeação de Servidor</option>
-                            <option value="2">Decreto nº 002/2025 - Regulamentação de Horários</option>
-                            <option value="3">Lei nº 003/2025 - Orçamento Anual</option>
+                            @foreach($materiasSemEdicao as $materia)
+                                <option value="{{ $materia->id }}">
+                                    {{ $materia->numero ?? 'S/N' }} - {{ $materia->titulo }}
+                                    ({{ $materia->tipo->nome ?? 'N/A' }} | {{ $materia->orgao->nome ?? 'N/A' }})
+                                </option>
+                            @endforeach
                         </select>
+                        @if($materiasSemEdicao->count() == 0)
+                            <small class="text-muted">Não há matérias disponíveis para nova edição.</small>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -144,16 +226,95 @@ $(document).ready(function() {
         placeholder: 'Selecione as matérias',
         allowClear: true
     });
+
+    // Submit do formulário de nova edição
+    $('#formNovaEdicao').on('submit', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            url: '{{ route("admin.diagramacao.gerar") }}',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                    $('#modalNovaEdicao').modal('hide');
+                    
+                    // Redirecionar para a edição criada se fornecida
+                    if (response.redirect) {
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                } else {
+                    toastr.error(response.message || 'Erro ao criar edição');
+                }
+            },
+            error: function(xhr) {
+                var errors = xhr.responseJSON?.errors || {};
+                var message = xhr.responseJSON?.message || 'Erro ao criar edição';
+                
+                if (Object.keys(errors).length > 0) {
+                    $.each(errors, function(field, messages) {
+                        toastr.error(messages[0]);
+                    });
+                } else {
+                    toastr.error(message);
+                }
+            }
+        });
+    });
 });
 
 function filtrarEdicoes() {
-    // Implementar filtro
-    console.log('Filtrando edições...');
+    var data = $('#filtro-data').val();
+    var status = $('#filtro-status').val();
+    
+    var params = new URLSearchParams();
+    if (data) params.append('data', data);
+    if (status) params.append('status', status);
+    
+    var url = '{{ route("admin.diagramacao.index") }}';
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    window.location.href = url;
 }
 
 function limparFiltros() {
     $('#filtro-data').val('');
     $('#filtro-status').val('');
+    window.location.href = '{{ route("admin.diagramacao.index") }}';
+}
+
+function excluirEdicao(edicaoId) {
+    if (confirm('Tem certeza que deseja excluir esta edição? Esta ação não pode ser desfeita.')) {
+        $.ajax({
+            url: '/admin/edicoes/' + edicaoId,
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Edição excluída com sucesso');
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    toastr.error(response.message || 'Erro ao excluir edição');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Erro ao excluir edição');
+            }
+        });
+    }
 }
 </script>
 @endpush

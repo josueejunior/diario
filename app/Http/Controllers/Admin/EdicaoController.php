@@ -17,7 +17,9 @@ class EdicaoController extends Controller
      */
     public function index()
     {
-        $edicoes = Edicao::orderBy('data', 'desc')->paginate(15);
+        $edicoes = Edicao::withCount('materias')
+            ->orderBy('data', 'desc')
+            ->paginate(15);
         return view('admin.edicoes.index', compact('edicoes'));
     }
 
@@ -235,10 +237,40 @@ class EdicaoController extends Controller
             );
         }
 
-        // Se não existir arquivo, retorna um erro ou gera um PDF básico
-        return response()->json([
-            'success' => false,
-            'message' => 'Arquivo PDF não encontrado para esta edição.'
-        ], 404);
+        // Se não existir arquivo, gera um PDF temporário com informações básicas
+        $html = '
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Edição ' . $edicao->numero . '</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .title { font-size: 24px; font-weight: bold; }
+                .subtitle { font-size: 16px; margin-top: 10px; }
+                .content { margin-top: 30px; }
+                .info { margin: 10px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">DIÁRIO OFICIAL</div>
+                <div class="subtitle">Edição Nº ' . $edicao->numero . '</div>
+                <div class="subtitle">Data: ' . $edicao->data->format('d/m/Y') . '</div>
+            </div>
+            <div class="content">
+                <div class="info"><strong>Status:</strong> ' . ($edicao->publicado ? 'Publicado' : 'Rascunho') . '</div>
+                <div class="info"><strong>Tipo:</strong> ' . ucfirst($edicao->tipo) . '</div>
+                <div class="info"><strong>Descrição:</strong> ' . ($edicao->descricao ?: 'Sem descrição') . '</div>
+                ' . ($edicao->observacoes ? '<div class="info"><strong>Observações:</strong> ' . $edicao->observacoes . '</div>' : '') . '
+            </div>
+        </body>
+        </html>';
+
+        // Gerar PDF usando DomPDF
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadHTML($html);
+        
+        return $pdf->stream("edicao-{$edicao->numero}.pdf");
     }
 }

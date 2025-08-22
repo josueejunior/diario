@@ -240,11 +240,15 @@ function publicarEdicao(id) {
                         });
                     }
                 },
-                error: function() {
+                error: function(xhr) {
+                    let message = 'Erro ao publicar edição.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
-                        text: 'Erro ao publicar edição.'
+                        text: message
                     });
                 }
             });
@@ -253,20 +257,8 @@ function publicarEdicao(id) {
 }
 
 function gerarPDF(id) {
-    Swal.fire({
-        title: 'Gerando PDF...',
-        text: 'Por favor, aguarde.',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    // Simular geração de PDF
-    setTimeout(() => {
-        Swal.close();
-        window.open(`/admin/edicoes/${id}/pdf`, '_blank');
-    }, 2000);
+    // Abrir PDF diretamente
+    window.open(`/admin/edicoes/${id}/pdf`, '_blank');
 }
 
 function excluirEdicao(id) {
@@ -299,11 +291,15 @@ function excluirEdicao(id) {
                         });
                     }
                 },
-                error: function() {
+                error: function(xhr) {
+                    let message = 'Erro ao excluir edição.';
+                    if(xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro!',
-                        text: 'Erro ao excluir edição.'
+                        text: message
                     });
                 }
             });
