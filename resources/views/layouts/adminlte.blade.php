@@ -220,8 +220,8 @@
                     </li>
 
                     <!-- Diário Oficial -->
-                    <li class="nav-item {{ request()->routeIs(['admin.edicoes.*', 'admin.materias.*', 'admin.tipos.*', 'admin.orgaos.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.edicoes.*', 'admin.materias.*', 'admin.tipos.*', 'admin.orgaos.*']) ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs(['admin.diagramacao.*', 'admin.materias.*', 'admin.materias-reprovadas.*', 'admin.edicoes.*', 'admin.informativos.*', 'admin.legislacao.*', 'admin.configurar-diario.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.diagramacao.*', 'admin.materias.*', 'admin.materias-reprovadas.*', 'admin.edicoes.*', 'admin.informativos.*', 'admin.legislacao.*', 'admin.configurar-diario.*']) ? 'active' : '' }}">
                             <i class="nav-icon fas fa-newspaper"></i>
                             <p>
                                 Diário Oficial
@@ -230,9 +230,9 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.edicoes.index') }}" class="nav-link {{ request()->routeIs('admin.edicoes.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.diagramacao.index') }}" class="nav-link {{ request()->routeIs('admin.diagramacao.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Edições</p>
+                                    <p>Diagramação</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -242,151 +242,83 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.tipos.index') }}" class="nav-link {{ request()->routeIs('admin.tipos.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.materias-reprovadas.index') }}" class="nav-link {{ request()->routeIs('admin.materias-reprovadas.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Tipos de Matéria</p>
+                                    <p>Matérias Reprovadas</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.orgaos.index') }}" class="nav-link {{ request()->routeIs('admin.orgaos.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.edicoes.index') }}" class="nav-link {{ request()->routeIs('admin.edicoes.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Órgãos</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Assinatura Digital -->
-                    <li class="nav-item {{ request()->routeIs(['admin.assinatura.*', 'admin.certificados.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.assinatura.*', 'admin.certificados.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-certificate"></i>
-                            <p>
-                                Assinatura Digital
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.assinatura.dashboard') }}" class="nav-link {{ request()->routeIs('admin.assinatura.dashboard') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard</p>
+                                    <p>Gestão de Edições</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.certificados.index') }}" class="nav-link {{ request()->routeIs('admin.certificados.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.informativos.index') }}" class="nav-link {{ request()->routeIs('admin.informativos.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Certificados</p>
+                                    <p>Informativos</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.assinatura.validacao') }}" class="nav-link {{ request()->routeIs('admin.assinatura.validacao') ? 'active' : '' }}">
+                                <a href="{{ route('admin.legislacao.index') }}" class="nav-link {{ request()->routeIs('admin.legislacao.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Validação</p>
+                                    <p>Legislação Aplicada</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.configurar-diario.index') }}" class="nav-link {{ request()->routeIs('admin.configurar-diario.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Configurar Diário</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Notificações & Webhooks -->
-                    <li class="nav-item {{ request()->routeIs(['admin.subscriptions.*', 'admin.webhooks.*', 'admin.notifications.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.subscriptions.*', 'admin.webhooks.*', 'admin.notifications.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-bell"></i>
+                    <!-- Configurações -->
+                    <li class="nav-item {{ request()->routeIs(['admin.entidade.*', 'admin.unidades.*', 'admin.tipos-arquivos.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.entidade.*', 'admin.unidades.*', 'admin.tipos-arquivos.*']) ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-cogs"></i>
                             <p>
-                                Notificações
+                                Configurações
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.subscriptions.index') }}" class="nav-link {{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.entidade.index') }}" class="nav-link {{ request()->routeIs('admin.entidade.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Inscrições</p>
+                                    <p>Entidade</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.webhooks.index') }}" class="nav-link {{ request()->routeIs('admin.webhooks.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.unidades.index') }}" class="nav-link {{ request()->routeIs('admin.unidades.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Webhooks</p>
+                                    <p>Unidades/Departamentos</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.notifications.index') }}" class="nav-link {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.tipos-arquivos.index') }}" class="nav-link {{ request()->routeIs('admin.tipos-arquivos.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Histórico</p>
+                                    <p>Tipos de Arquivos</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Workflow & Aprovação -->
-                    <li class="nav-item {{ request()->routeIs(['admin.workflow.*', 'admin.approval.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.workflow.*', 'admin.approval.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tasks"></i>
+                    <!-- Ferramentas -->
+                    <li class="nav-item {{ request()->routeIs(['admin.logs.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.logs.*']) ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tools"></i>
                             <p>
-                                Workflow
+                                Ferramentas
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.approval.pending') }}" class="nav-link {{ request()->routeIs('admin.approval.pending') ? 'active' : '' }}">
+                                <a href="{{ route('admin.logs.sistema') }}" class="nav-link {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Pendências</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.workflow.index') }}" class="nav-link {{ request()->routeIs('admin.workflow.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Configurar Fluxo</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.approval.history') }}" class="nav-link {{ request()->routeIs('admin.approval.history') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Histórico</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Relatórios -->
-                    <li class="nav-item {{ request()->routeIs(['admin.relatorios.*', 'admin.audit.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.relatorios.*', 'admin.audit.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-chart-pie"></i>
-                            <p>
-                                Relatórios
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('admin.relatorios.index') }}" class="nav-link {{ request()->routeIs('admin.relatorios.index') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.relatorios.publicacoes') }}" class="nav-link {{ request()->routeIs('admin.relatorios.publicacoes') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Publicações</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.relatorios.visualizacoes') }}" class="nav-link {{ request()->routeIs('admin.relatorios.visualizacoes') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Visualizações</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.relatorios.downloads') }}" class="nav-link {{ request()->routeIs('admin.relatorios.downloads') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Downloads</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.audit.dashboard') }}" class="nav-link {{ request()->routeIs('admin.audit.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Auditoria</p>
+                                    <p>Logs do Sistema</p>
                                 </a>
                             </li>
                         </ul>
@@ -397,7 +329,7 @@
                         <a href="#" class="nav-link {{ request()->routeIs(['admin.users.*', 'admin.roles.*', 'admin.permissions.*']) ? 'active' : '' }}">
                             <i class="nav-icon fas fa-users"></i>
                             <p>
-                                Usuários
+                                Usuários & Permissões
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -405,13 +337,13 @@
                             <li class="nav-item">
                                 <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Usuários</p>
+                                    <p>Gerenciar Usuários</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Perfis</p>
+                                    <p>Perfis de Acesso</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -423,112 +355,82 @@
                         </ul>
                     </li>
 
-                    <!-- Configurações -->
-                    <li class="nav-item {{ request()->routeIs(['admin.configuracoes.*', 'admin.sistema.*', 'admin.backup.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.configuracoes.*', 'admin.sistema.*', 'admin.backup.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-cogs"></i>
+                    <!-- Certificados Digitais -->
+                    <li class="nav-item {{ request()->routeIs(['admin.certificados-nuvem.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.certificados-nuvem.*']) ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-certificate"></i>
                             <p>
-                                Configurações
+                                Certificados Digitais
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.configuracoes.geral') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.geral') ? 'active' : '' }}">
+                                <a href="{{ route('admin.certificados-nuvem.index') }}" class="nav-link {{ request()->routeIs('admin.certificados-nuvem.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Geral</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.configuracoes.email') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.email') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>E-mail</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.configuracoes.whatsapp') }}" class="nav-link {{ request()->routeIs('admin.configuracoes.whatsapp') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>WhatsApp</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sistema.info') }}" class="nav-link {{ request()->routeIs('admin.sistema.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Sistema</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.backup.index') }}" class="nav-link {{ request()->routeIs('admin.backup.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Backup</p>
+                                    <p>Certificados em Nuvem</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- Ferramentas -->
-                    <li class="nav-item {{ request()->routeIs(['admin.ferramentas.*', 'admin.migration.*', 'admin.search.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.ferramentas.*', 'admin.migration.*', 'admin.search.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tools"></i>
+                    <!-- Plataforma -->
+                    <li class="nav-item {{ request()->routeIs(['admin.usuarios-root.*', 'admin.ajustes-gerais.*', 'admin.tickets.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.usuarios-root.*', 'admin.ajustes-gerais.*', 'admin.tickets.*']) ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-server"></i>
                             <p>
-                                Ferramentas
+                                Plataforma
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.search.advanced') }}" class="nav-link {{ request()->routeIs('admin.search.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.usuarios-root.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios-root.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Busca Avançada</p>
+                                    <p>Usuários [Root]</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.migration.dashboard') }}" class="nav-link {{ request()->routeIs('admin.migration.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.ajustes-gerais.index') }}" class="nav-link {{ request()->routeIs('admin.ajustes-gerais.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Migração/OCR</p>
+                                    <p>Ajustes Gerais</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.ferramentas.observability') }}" class="nav-link {{ request()->routeIs('admin.ferramentas.observability') ? 'active' : '' }}">
+                                <a href="{{ route('admin.tickets.meus') }}" class="nav-link {{ request()->routeIs('admin.tickets.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Observabilidade</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.ferramentas.accessibility') }}" class="nav-link {{ request()->routeIs('admin.ferramentas.accessibility') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Acessibilidade</p>
+                                    <p>Meus Tickets</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
 
-                    <!-- API & Dados Abertos -->
-                    <li class="nav-item {{ request()->routeIs(['admin.api.*', 'admin.opendata.*']) ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs(['admin.api.*', 'admin.opendata.*']) ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-database"></i>
+                    <!-- Site -->
+                    <li class="nav-item {{ request()->routeIs(['admin.pesquisas-site.*', 'admin.analytics.*', 'admin.usuarios-online.*']) ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs(['admin.pesquisas-site.*', 'admin.analytics.*', 'admin.usuarios-online.*']) ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-globe"></i>
                             <p>
-                                API & Dados
+                                Site
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('admin.api.dashboard') }}" class="nav-link {{ request()->routeIs('admin.api.dashboard') ? 'active' : '' }}">
+                                <a href="{{ route('admin.pesquisas-site.index') }}" class="nav-link {{ request()->routeIs('admin.pesquisas-site.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard API</p>
+                                    <p>Pesquisas do Site</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.api.tokens') }}" class="nav-link {{ request()->routeIs('admin.api.tokens') ? 'active' : '' }}">
+                                <a href="{{ route('admin.analytics.dashboard') }}" class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Tokens de Acesso</p>
+                                    <p>Analytics</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.opendata.catalog') }}" class="nav-link {{ request()->routeIs('admin.opendata.*') ? 'active' : '' }}">
+                                <a href="{{ route('admin.usuarios-online.index') }}" class="nav-link {{ request()->routeIs('admin.usuarios-online.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Catálogo Aberto</p>
+                                    <p>Usuários Online</p>
                                 </a>
                             </li>
                         </ul>

@@ -12,6 +12,16 @@ use App\Models\ConfiguracaoSistema;
 class ConfiguracaoController extends Controller
 {
     /**
+     * Display the configuration dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        return view('admin.configuracoes.index');
+    }
+
+    /**
      * Display general configurations.
      */
     public function geral()

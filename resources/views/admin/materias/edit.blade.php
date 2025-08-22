@@ -1,24 +1,43 @@
-<x-admin-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Editar Matéria') }}
-        </h2>
-    </x-slot>
+@extends('layouts.adminlte')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <div class="mb-4">
-                        <a href="{{ route('materias.index') }}" class="text-blue-600 hover:text-blue-900">
-                            &larr; Voltar para lista
+@section('title', 'Editar Matéria')
+
+@section('content_header')
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1><i class="fas fa-edit mr-2"></i>Editar Matéria</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.materias.index') }}">Matérias</a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </div>
+    </div>
+@stop
+
+@section('content')
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-edit mr-1"></i>
+                        Editar Matéria
+                    </h3>
+                    <div class="card-tools">
+                        <a href="{{ route('admin.materias.index') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Voltar
                         </a>
                     </div>
-
+                </div>
+                <div class="card-body">
                     @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <strong class="font-bold">Erro!</strong>
-                            <ul>
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <h5><i class="icon fas fa-ban"></i> Erro!</h5>
+                            <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -26,89 +45,171 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('materias.update', $materia) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="{{ route('admin.materias.update', $materia) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="tipo_id" class="block text-sm font-medium text-gray-700">Tipo</label>
-                                <select name="tipo_id" id="tipo_id" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    <option value="">Selecione um tipo</option>
-                                    @foreach ($tipos as $tipo)
-                                        <option value="{{ $tipo->id }}" {{ old('tipo_id', $materia->tipo_id) == $tipo->id ? 'selected' : '' }}>
-                                            {{ $tipo->nome }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tipo_id">Tipo <span class="text-danger">*</span></label>
+                                    <select name="tipo_id" id="tipo_id" class="form-control @error('tipo_id') is-invalid @enderror" required>
+                                        <option value="">Selecione um tipo</option>
+                                        @foreach ($tipos as $tipo)
+                                            <option value="{{ $tipo->id }}" {{ old('tipo_id', $materia->tipo_id) == $tipo->id ? 'selected' : '' }}>
+                                                {{ $tipo->nome }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('tipo_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
 
-                            <div>
-                                <label for="orgao_id" class="block text-sm font-medium text-gray-700">Órgão</label>
-                                <select name="orgao_id" id="orgao_id" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    <option value="">Selecione um órgão</option>
-                                    @foreach ($orgaos as $orgao)
-                                        <option value="{{ $orgao->id }}" {{ old('orgao_id', $materia->orgao_id) == $orgao->id ? 'selected' : '' }}>
-                                            {{ $orgao->nome }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="numero" class="block text-sm font-medium text-gray-700">Número</label>
-                                <input type="text" name="numero" id="numero" value="{{ old('numero', $materia->numero) }}" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            </div>
-
-                            <div>
-                                <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
-                                <input type="date" name="data" id="data" value="{{ old('data', $materia->data->format('Y-m-d')) }}" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="orgao_id">Órgão <span class="text-danger">*</span></label>
+                                    <select name="orgao_id" id="orgao_id" class="form-control @error('orgao_id') is-invalid @enderror" required>
+                                        <option value="">Selecione um órgão</option>
+                                        @foreach ($orgaos as $orgao)
+                                            <option value="{{ $orgao->id }}" {{ old('orgao_id', $materia->orgao_id) == $orgao->id ? 'selected' : '' }}>
+                                                {{ $orgao->nome }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('orgao_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
-                        <div>
-                            <label for="titulo" class="block text-sm font-medium text-gray-700">Título</label>
-                            <input type="text" name="titulo" id="titulo" value="{{ old('titulo', $materia->titulo) }}" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="numero">Número <span class="text-danger">*</span></label>
+                                    <input type="text" name="numero" id="numero" value="{{ old('numero', $materia->numero) }}" 
+                                           class="form-control @error('numero') is-invalid @enderror" required>
+                                    @error('numero')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="data">Data <span class="text-danger">*</span></label>
+                                    <input type="date" name="data" id="data" value="{{ old('data', $materia->data ? $materia->data->format('Y-m-d') : '') }}" 
+                                           class="form-control @error('data') is-invalid @enderror" required>
+                                    @error('data')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <label for="texto" class="block text-sm font-medium text-gray-700">Texto</label>
-                            <textarea name="texto" id="texto" rows="10" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('texto', $materia->texto) }}</textarea>
+                        <div class="form-group">
+                            <label for="titulo">Título <span class="text-danger">*</span></label>
+                            <input type="text" name="titulo" id="titulo" value="{{ old('titulo', $materia->titulo) }}" 
+                                   class="form-control @error('titulo') is-invalid @enderror" required>
+                            @error('titulo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div>
-                            <label for="arquivo" class="block text-sm font-medium text-gray-700">Arquivo (Opcional)</label>
-                            <input type="file" name="arquivo" id="arquivo"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <p class="text-gray-500 text-xs mt-1">Formatos aceitos: PDF, DOC, DOCX, ODT. Tamanho máximo: 10MB</p>
+                        <div class="form-group">
+                            <label for="texto">Texto <span class="text-danger">*</span></label>
+                            <textarea name="texto" id="texto" rows="10" 
+                                      class="form-control @error('texto') is-invalid @enderror" required>{{ old('texto', $materia->texto) }}</textarea>
+                            @error('texto')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arquivo">Arquivo (Opcional)</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="arquivo" id="arquivo" 
+                                           class="custom-file-input @error('arquivo') is-invalid @enderror" 
+                                           accept=".pdf,.doc,.docx,.odt">
+                                    <label class="custom-file-label" for="arquivo">Escolher arquivo...</label>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Formatos aceitos: PDF, DOC, DOCX, ODT. Tamanho máximo: 10MB
+                            </small>
+                            @error('arquivo')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                             
                             @if ($materia->arquivo)
                                 <div class="mt-2">
-                                    <p class="text-sm">Arquivo atual: 
-                                        <a href="{{ Storage::url($materia->arquivo) }}" target="_blank" class="text-blue-600 hover:text-blue-900">
-                                            Ver Arquivo
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-file mr-1"></i>
+                                        Arquivo atual: 
+                                        <a href="{{ Storage::url($materia->arquivo) }}" target="_blank" class="alert-link">
+                                            {{ basename($materia->arquivo) }}
                                         </a>
-                                    </p>
+                                    </div>
                                 </div>
                             @endif
                         </div>
 
-                        <div>
-                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-1"></i>
                                 Atualizar Matéria
                             </button>
+                            <a href="{{ route('admin.materias.index') }}" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times mr-1"></i>
+                                Cancelar
+                            </a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</x-admin-layout>
+@stop
+
+@section('css')
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+@stop
+
+@section('js')
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- BS Custom File Input -->
+    <script src="{{ asset('vendor/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+
+    <script>
+        $(function () {
+            // Initialize BS Custom File Input
+            bsCustomFileInput.init();
+        });
+
+        // Show success message if session has success
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        // Show error message if session has error
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: '{{ session('error') }}'
+            });
+        @endif
+    </script>
+@stop

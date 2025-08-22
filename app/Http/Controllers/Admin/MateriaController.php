@@ -101,7 +101,7 @@ class MateriaController extends Controller
 
         $materia = Materia::create($dados);
 
-        return redirect()->route('materias.show', $materia)
+        return redirect()->route('admin.materias.show', $materia)
                          ->with('success', 'Matéria criada com sucesso.');
     }
 
@@ -170,7 +170,7 @@ class MateriaController extends Controller
 
         $materia->update($dados);
 
-        return redirect()->route('materias.show', $materia)
+        return redirect()->route('admin.materias.show', $materia)
                          ->with('success', 'Matéria atualizada com sucesso.');
     }
 
@@ -189,7 +189,7 @@ class MateriaController extends Controller
 
         $materia->delete();
 
-        return redirect()->route('materias.index')
+        return redirect()->route('admin.materias.index')
                          ->with('success', 'Matéria excluída com sucesso.');
     }
 

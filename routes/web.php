@@ -13,6 +13,23 @@ use App\Http\Controllers\Admin\OrgaoController;
 use App\Http\Controllers\Admin\AssinaturaController;
 use App\Http\Controllers\Admin\RelatorioController;
 use App\Http\Controllers\Admin\AuditController;
+// New Controller Imports for Augustinópolis-TO Menu Structure
+use App\Http\Controllers\Admin\DiagramacaoController;
+use App\Http\Controllers\Admin\MateriasReprovadasController;
+use App\Http\Controllers\Admin\InformativoController;
+use App\Http\Controllers\Admin\LegislacaoController;
+use App\Http\Controllers\Admin\ConfigurarDiarioController;
+use App\Http\Controllers\Admin\EntidadeController;
+use App\Http\Controllers\Admin\UnidadeController;
+use App\Http\Controllers\Admin\TipoArquivoController;
+use App\Http\Controllers\Admin\LogsController;
+use App\Http\Controllers\Admin\CertificadosNuvemController;
+use App\Http\Controllers\Admin\UsuariosRootController;
+use App\Http\Controllers\Admin\AjustesGeraisController;
+use App\Http\Controllers\Admin\TicketsController;
+use App\Http\Controllers\Admin\PesquisasSiteController;
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\UsuariosOnlineController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,14 +95,155 @@ Route::prefix('diario')->group(function () {
 });
 
 // Rotas Administrativas
-Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'verified', 'audit', 'system_audit'])->group(function () {
     // Dashboard Principal AdminLTE
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
     
     // Dashboard antigo (manter compatibilidade)
     Route::get('/dashboard-old', function () {
         return view('admin.dashboard');
-    })->name('dashboard');    // Edições
+    })->name('dashboard');
+
+    // === DIÁRIO OFICIAL SECTION ===
+    // Diagramação
+    Route::prefix('diagramacao')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'index'])->name('admin.diagramacao.index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'show'])->name('admin.diagramacao.show');
+        Route::get('/{id}/editar', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'edit'])->name('admin.diagramacao.edit');
+        Route::post('/gerar', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'gerar'])->name('admin.diagramacao.gerar');
+        Route::post('/salvar', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'salvar'])->name('admin.diagramacao.salvar');
+        Route::get('/materias/disponiveis', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'getMateriasDisponiveis'])->name('admin.diagramacao.materias');
+        Route::post('/remover-materia', [\App\Http\Controllers\Admin\DiagramacaoController::class, 'removerMateria'])->name('admin.diagramacao.remover-materia');
+    });
+    
+    // Matérias Reprovadas
+    Route::prefix('materias-reprovadas')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MateriasReprovadasController::class, 'index'])->name('admin.materias-reprovadas.index');
+        Route::post('/{materia}/revisar', [\App\Http\Controllers\Admin\MateriasReprovadasController::class, 'revisar'])->name('admin.materias-reprovadas.revisar');
+        Route::delete('/{materia}', [\App\Http\Controllers\Admin\MateriasReprovadasController::class, 'destroy'])->name('admin.materias-reprovadas.destroy');
+    });
+
+    // Informativos
+    Route::resource('informativos', \App\Http\Controllers\Admin\InformativoController::class)->names([
+        'index' => 'admin.informativos.index',
+        'create' => 'admin.informativos.create',
+        'store' => 'admin.informativos.store',
+        'show' => 'admin.informativos.show',
+        'edit' => 'admin.informativos.edit',
+        'update' => 'admin.informativos.update',
+        'destroy' => 'admin.informativos.destroy'
+    ]);
+
+    // Legislação Aplicada
+    Route::resource('legislacao', \App\Http\Controllers\Admin\LegislacaoController::class)->names([
+        'index' => 'admin.legislacao.index',
+        'create' => 'admin.legislacao.create',
+        'store' => 'admin.legislacao.store',
+        'show' => 'admin.legislacao.show',
+        'edit' => 'admin.legislacao.edit',
+        'update' => 'admin.legislacao.update',
+        'destroy' => 'admin.legislacao.destroy'
+    ]);
+
+    // Configurar Diário
+    Route::prefix('configurar-diario')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ConfigurarDiarioController::class, 'index'])->name('admin.configurar-diario.index');
+        Route::post('/template', [\App\Http\Controllers\Admin\ConfigurarDiarioController::class, 'salvarTemplate'])->name('admin.configurar-diario.template');
+        Route::post('/assinatura', [\App\Http\Controllers\Admin\ConfigurarDiarioController::class, 'configurarAssinatura'])->name('admin.configurar-diario.assinatura');
+    });
+
+    // === CONFIGURAÇÕES SECTION ===
+    // Entidade
+    Route::prefix('entidade')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EntidadeController::class, 'index'])->name('admin.entidade.index');
+        Route::post('/', [\App\Http\Controllers\Admin\EntidadeController::class, 'update'])->name('admin.entidade.update');
+    });
+
+    // Unidades/Departamentos
+    Route::resource('unidades', \App\Http\Controllers\Admin\UnidadeController::class)->names([
+        'index' => 'admin.unidades.index',
+        'create' => 'admin.unidades.create',
+        'store' => 'admin.unidades.store',
+        'show' => 'admin.unidades.show',
+        'edit' => 'admin.unidades.edit',
+        'update' => 'admin.unidades.update',
+        'destroy' => 'admin.unidades.destroy'
+    ]);
+
+    // Tipos de Arquivos
+    Route::resource('tipos-arquivos', \App\Http\Controllers\Admin\TipoArquivoController::class)->names([
+        'index' => 'admin.tipos-arquivos.index',
+        'create' => 'admin.tipos-arquivos.create',
+        'store' => 'admin.tipos-arquivos.store',
+        'show' => 'admin.tipos-arquivos.show',
+        'edit' => 'admin.tipos-arquivos.edit',
+        'update' => 'admin.tipos-arquivos.update',
+        'destroy' => 'admin.tipos-arquivos.destroy'
+    ]);
+
+    // === FERRAMENTAS SECTION ===
+    // Logs do Sistema
+    Route::prefix('logs')->group(function () {
+        Route::get('/sistema', [\App\Http\Controllers\Admin\LogsController::class, 'sistema'])->name('admin.logs.sistema');
+        Route::get('/download', [\App\Http\Controllers\Admin\LogsController::class, 'download'])->name('admin.logs.download');
+        Route::post('/clear', [\App\Http\Controllers\Admin\LogsController::class, 'clear'])->name('admin.logs.clear');
+        Route::get('/export', [\App\Http\Controllers\Admin\LogsController::class, 'export'])->name('admin.logs.export');
+        Route::post('/cleanup', [\App\Http\Controllers\Admin\LogsController::class, 'cleanup'])->name('admin.logs.cleanup');
+    });
+
+    // === CERTIFICADOS DIGITAIS SECTION ===
+    // Certificados em Nuvem
+    Route::prefix('certificados-nuvem')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\CertificadosNuvemController::class, 'index'])->name('admin.certificados-nuvem.index');
+        Route::post('/upload', [\App\Http\Controllers\Admin\CertificadosNuvemController::class, 'upload'])->name('admin.certificados-nuvem.upload');
+        Route::delete('/{certificado}', [\App\Http\Controllers\Admin\CertificadosNuvemController::class, 'destroy'])->name('admin.certificados-nuvem.destroy');
+        Route::post('/{certificado}/test', [\App\Http\Controllers\Admin\CertificadosNuvemController::class, 'test'])->name('admin.certificados-nuvem.test');
+    });
+
+    // === PLATAFORMA SECTION ===
+    // Usuários [Root]
+    Route::prefix('usuarios-root')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\UsuariosRootController::class, 'index'])->name('admin.usuarios-root.index');
+        Route::post('/', [\App\Http\Controllers\Admin\UsuariosRootController::class, 'store'])->name('admin.usuarios-root.store');
+        Route::post('/create-new', [\App\Http\Controllers\Admin\UsuariosRootController::class, 'createNew'])->name('admin.usuarios-root.create-new');
+        Route::get('/atividade', [\App\Http\Controllers\Admin\UsuariosRootController::class, 'atividade'])->name('admin.usuarios-root.atividade');
+        Route::delete('/{usuario}', [\App\Http\Controllers\Admin\UsuariosRootController::class, 'destroy'])->name('admin.usuarios-root.destroy');
+    });
+
+    // Ajustes Gerais
+    Route::prefix('ajustes-gerais')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AjustesGeraisController::class, 'index'])->name('admin.ajustes-gerais.index');
+        Route::post('/', [\App\Http\Controllers\Admin\AjustesGeraisController::class, 'update'])->name('admin.ajustes-gerais.update');
+    });
+
+    // Meus Tickets
+    Route::prefix('tickets')->group(function () {
+        Route::get('/meus', [\App\Http\Controllers\Admin\TicketsController::class, 'meus'])->name('admin.tickets.meus');
+        Route::post('/', [\App\Http\Controllers\Admin\TicketsController::class, 'store'])->name('admin.tickets.store');
+        Route::get('/{ticket}', [\App\Http\Controllers\Admin\TicketsController::class, 'show'])->name('admin.tickets.show');
+        Route::post('/{ticket}/responder', [\App\Http\Controllers\Admin\TicketsController::class, 'responder'])->name('admin.tickets.responder');
+    });
+
+    // === SITE SECTION ===
+    // Pesquisas do Site
+    Route::prefix('pesquisas-site')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PesquisasSiteController::class, 'index'])->name('admin.pesquisas-site.index');
+        Route::get('/relatorio', [\App\Http\Controllers\Admin\PesquisasSiteController::class, 'relatorio'])->name('admin.pesquisas-site.relatorio');
+        Route::post('/export', [\App\Http\Controllers\Admin\PesquisasSiteController::class, 'export'])->name('admin.pesquisas-site.export');
+    });
+
+    // Analytics
+    Route::prefix('analytics')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\AnalyticsController::class, 'dashboard'])->name('admin.analytics.dashboard');
+        Route::get('/visitas', [\App\Http\Controllers\Admin\AnalyticsController::class, 'visitas'])->name('admin.analytics.visitas');
+        Route::get('/documentos', [\App\Http\Controllers\Admin\AnalyticsController::class, 'documentos'])->name('admin.analytics.documentos');
+    });
+
+    // Usuários Online
+    Route::prefix('usuarios-online')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\UsuariosOnlineController::class, 'index'])->name('admin.usuarios-online.index');
+        Route::get('/sessoes', [\App\Http\Controllers\Admin\UsuariosOnlineController::class, 'sessoes'])->name('admin.usuarios-online.sessoes');
+    });    // Edições
     Route::resource('edicoes', EdicaoController::class, ['parameters' => ['edicoes' => 'edicao']])->names([
         'index' => 'admin.edicoes.index',
         'create' => 'admin.edicoes.create',
@@ -97,6 +255,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
     ]);
     Route::post('/edicoes/{edicao}/publicar', [EdicaoController::class, 'publicar'])->name('admin.edicoes.publicar');
     Route::post('/edicoes/{edicao}/assinar', [EdicaoController::class, 'assinar'])->name('admin.edicoes.assinar');
+    Route::get('/edicoes/{edicao}/pdf', [EdicaoController::class, 'pdf'])->name('admin.edicoes.pdf');
     
     // Matérias
     Route::resource('materias', MateriaController::class, ['parameters' => ['materias' => 'materia']])->names([
@@ -165,13 +324,24 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
 
     // Usuários & Permissões
     Route::prefix('users')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/', [\App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('admin.users.index');
+        Route::get('/create', [\App\Http\Controllers\Admin\UserManagementController::class, 'create'])->name('admin.users.create');
+        Route::post('/', [\App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('admin.users.store');
+        Route::get('/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('admin.users.show');
+        Route::get('/{user}/edit', [\App\Http\Controllers\Admin\UserManagementController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('admin.users.update');
+        Route::delete('/{user}', [\App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('admin.users.destroy');
+        Route::post('/{user}/toggle-status', [\App\Http\Controllers\Admin\UserManagementController::class, 'toggleStatus'])->name('admin.users.toggle-status');
+        Route::post('/{user}/reset-password', [\App\Http\Controllers\Admin\UserManagementController::class, 'resetPassword'])->name('admin.users.reset-password');
+        Route::post('/{user}/restore', [\App\Http\Controllers\Admin\UserManagementController::class, 'restore'])->name('admin.users.restore');
+        
         Route::get('/roles', [\App\Http\Controllers\Admin\RoleController::class, 'index'])->name('admin.roles.index');
         Route::get('/permissions', [\App\Http\Controllers\Admin\PermissionController::class, 'index'])->name('admin.permissions.index');
     });
 
     // Configurações
     Route::prefix('configuracoes')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'index'])->name('admin.configuracoes.index');
         Route::get('/geral', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'geral'])->name('admin.configuracoes.geral');
         Route::post('/geral', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'atualizarGeral'])->name('admin.configuracoes.geral.update');
         
@@ -216,9 +386,9 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
     // Busca Global
     Route::get('/search', [\App\Http\Controllers\Admin\AdminController::class, 'search'])->name('admin.search');
 
-    // Perfil do Usuário
-    Route::get('/profile', [\App\Http\Controllers\Admin\AdminController::class, 'profileEdit'])->name('admin.profile.edit');
-    Route::post('/profile', [\App\Http\Controllers\Admin\AdminController::class, 'profileUpdate'])->name('admin.profile.update');
+    // Perfil do Usuário AdminLTE
+    Route::get('/perfil', [\App\Http\Controllers\Admin\AdminController::class, 'profileEdit'])->name('admin.profile.edit');
+    Route::post('/perfil', [\App\Http\Controllers\Admin\AdminController::class, 'profileUpdate'])->name('admin.profile.update');
     
     // Auditoria
     Route::prefix('auditoria')->middleware('audit')->group(function () {
@@ -229,7 +399,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
         Route::post('/limpar', [AuditController::class, 'cleanup'])->name('admin.audit.cleanup');
     });
 
-    // Manter rotas antigas para compatibilidade
+    // Manter rotas antigas para compatibilidade (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

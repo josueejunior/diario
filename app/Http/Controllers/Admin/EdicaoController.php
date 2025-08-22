@@ -139,7 +139,7 @@ class EdicaoController extends Controller
 
         $edicao->update($dados);
 
-        return redirect()->route('edicoes.show', $edicao)
+        return redirect()->route('admin.edicoes.show', $edicao)
                          ->with('success', 'Edição atualizada com sucesso.');
     }
 
@@ -147,7 +147,7 @@ class EdicaoController extends Controller
      * Remove uma edição do banco de dados.
      *
      * @param  \App\Models\Edicao  $edicao
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function destroy(Edicao $edicao)
     {
@@ -158,7 +158,15 @@ class EdicaoController extends Controller
 
         $edicao->delete();
 
-        return redirect()->route('edicoes.index')
+        // Se for uma requisição AJAX, retorna JSON
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Edição excluída com sucesso.'
+            ]);
+        }
+
+        return redirect()->route('admin.edicoes.index')
                          ->with('success', 'Edição excluída com sucesso.');
     }
 
@@ -166,7 +174,7 @@ class EdicaoController extends Controller
      * Publica uma edição.
      *
      * @param  \App\Models\Edicao  $edicao
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function publicar(Edicao $edicao)
     {
@@ -174,6 +182,14 @@ class EdicaoController extends Controller
             'publicado' => true,
             'data_publicacao' => now()
         ]);
+
+        // Se for uma requisição AJAX, retorna JSON
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Edição publicada com sucesso!'
+            ]);
+        }
 
         return back()->with('success', 'Edição publicada com sucesso!');
     }
@@ -197,5 +213,32 @@ class EdicaoController extends Controller
         ]);
 
         return back()->with('success', 'Edição assinada digitalmente com sucesso!');
+    }
+
+    /**
+     * Gera ou exibe o PDF de uma edição.
+     *
+     * @param  \App\Models\Edicao  $edicao
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public function pdf(Edicao $edicao)
+    {
+        // Verificar se tem caminho de arquivo definido
+        if ($edicao->caminho_arquivo && Storage::disk('public')->exists($edicao->caminho_arquivo)) {
+            // Se o arquivo existir, retorna o arquivo
+            return response()->file(
+                storage_path("app/public/{$edicao->caminho_arquivo}"), 
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="edicao-'.$edicao->numero.'.pdf"'
+                ]
+            );
+        }
+
+        // Se não existir arquivo, retorna um erro ou gera um PDF básico
+        return response()->json([
+            'success' => false,
+            'message' => 'Arquivo PDF não encontrado para esta edição.'
+        ], 404);
     }
 }
