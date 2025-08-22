@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Portal\EdicaoController as PortalEdicaoController;
 use App\Http\Controllers\Portal\MateriaController as PortalMateriaController;
 use App\Http\Controllers\Portal\SubscriptionController;
+use App\Http\Controllers\Portal\AtoController;
 use App\Http\Controllers\Admin\EdicaoController;
 use App\Http\Controllers\Admin\MateriaController;
 use App\Http\Controllers\Admin\TipoController;
@@ -53,6 +54,27 @@ Route::prefix('diario')->group(function () {
     // Verificação de Autenticidade
     Route::get('/verificar', [PortalEdicaoController::class, 'verificar'])->name('portal.verificar');
     Route::post('/verificar', [PortalEdicaoController::class, 'verificarHash'])->name('portal.verificar');
+
+    // Atos individuais com URLs permanentes
+    Route::get('/ato/{materia}', [AtoController::class, 'show'])->name('portal.atos.show');
+    Route::get('/ato/{materia}/json', [AtoController::class, 'json'])->name('portal.atos.json');
+    Route::get('/atos/sitemap.xml', [AtoController::class, 'sitemap'])->name('portal.atos.sitemap');
+
+    // Notificações e Assinaturas
+    Route::prefix('notificacoes')->group(function () {
+        Route::get('/', [SubscriptionController::class, 'index'])->name('portal.subscriptions.index');
+        Route::post('/', [SubscriptionController::class, 'store'])->name('portal.subscriptions.store');
+        Route::get('/verificar/{token}', [SubscriptionController::class, 'verify'])->name('portal.subscriptions.verify');
+        Route::get('/gerenciar/{token}', [SubscriptionController::class, 'manage'])->name('portal.subscriptions.manage');
+        Route::put('/gerenciar/{token}', [SubscriptionController::class, 'update'])->name('portal.subscriptions.update');
+        Route::delete('/cancelar/{token}', [SubscriptionController::class, 'unsubscribe'])->name('portal.subscriptions.unsubscribe');
+        Route::post('/reenviar-verificacao', [SubscriptionController::class, 'resendVerification'])->name('portal.subscriptions.resend');
+        Route::post('/solicitar-gerenciamento', [SubscriptionController::class, 'requestManagement'])->name('portal.subscriptions.request');
+    });
+    
+    // Busca Avançada
+    Route::get('/busca-avancada', [HomeController::class, 'advancedSearch'])->name('portal.search.advanced');
+    Route::post('/busca-rapida', [HomeController::class, 'quickSearch'])->name('portal.search.quick');
 });
 
 // Rotas Administrativas
@@ -88,12 +110,12 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
     Route::get('/relatorios/publicacoes', [RelatorioController::class, 'publicacoes'])->name('relatorios.publicacoes');
     
     // Auditoria
-    Route::prefix('audit')->name('admin.audit.')->group(function () {
-        Route::get('/dashboard', [AuditController::class, 'dashboard'])->name('dashboard');
-        Route::get('/', [AuditController::class, 'index'])->name('index');
-        Route::get('/{auditLog}', [AuditController::class, 'show'])->name('show');
-        Route::get('/export', [AuditController::class, 'export'])->name('export');
-        Route::post('/cleanup', [AuditController::class, 'cleanup'])->name('cleanup');
+    Route::prefix('auditoria')->middleware('audit')->group(function () {
+        Route::get('/', [AuditController::class, 'index'])->name('admin.audit.index');
+        Route::get('/dashboard', [AuditController::class, 'dashboard'])->name('admin.audit.dashboard');
+        Route::get('/exportar', [AuditController::class, 'export'])->name('admin.audit.export');
+        Route::get('/{auditLog}', [AuditController::class, 'show'])->name('admin.audit.show');
+        Route::post('/limpar', [AuditController::class, 'cleanup'])->name('admin.audit.cleanup');
     });
     
     // Perfil do Usuário

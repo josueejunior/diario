@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\RSSController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EdicaoController;
+use App\Http\Controllers\Api\WebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,17 @@ Route::prefix('v1')->group(function () {
     
     // Estatísticas Públicas
     Route::get('/estatisticas', [DocumentController::class, 'estatisticas'])->name('api.estatisticas');
+    
+    // Webhooks e Dados Abertos
+    Route::prefix('webhooks')->group(function () {
+        Route::get('/', [WebhookController::class, 'index'])->name('api.webhooks.index');
+        Route::post('/', [WebhookController::class, 'store'])->name('api.webhooks.store');
+        Route::delete('/{id}', [WebhookController::class, 'destroy'])->name('api.webhooks.destroy');
+        Route::post('/{id}/test', [WebhookController::class, 'test'])->name('api.webhooks.test');
+    });
+    
+    // Portal CKAN-style para dados abertos
+    Route::get('/catalog', [WebhookController::class, 'catalog'])->name('api.catalog');
 });
 
 // Rotas autenticadas da API
