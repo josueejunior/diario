@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TipoController;
 use App\Http\Controllers\Admin\OrgaoController;
 use App\Http\Controllers\Admin\AssinaturaController;
 use App\Http\Controllers\Admin\RelatorioController;
+use App\Http\Controllers\Admin\AuditController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Route;
 // Rota da Home Principal
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/buscar', [HomeController::class, 'buscar'])->name('home.buscar');
+Route::get('/api/quick-search', [HomeController::class, 'quickSearch'])->name('home.quick-search');
 
 // Rotas Públicas do Portal
 Route::prefix('diario')->group(function () {
@@ -54,7 +56,7 @@ Route::prefix('diario')->group(function () {
 });
 
 // Rotas Administrativas
-Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
@@ -84,6 +86,15 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/relatorios/downloads', [RelatorioController::class, 'downloads'])->name('relatorios.downloads');
     Route::get('/relatorios/visualizacoes', [RelatorioController::class, 'visualizacoes'])->name('relatorios.visualizacoes');
     Route::get('/relatorios/publicacoes', [RelatorioController::class, 'publicacoes'])->name('relatorios.publicacoes');
+    
+    // Auditoria
+    Route::prefix('audit')->name('admin.audit.')->group(function () {
+        Route::get('/dashboard', [AuditController::class, 'dashboard'])->name('dashboard');
+        Route::get('/', [AuditController::class, 'index'])->name('index');
+        Route::get('/{auditLog}', [AuditController::class, 'show'])->name('show');
+        Route::get('/export', [AuditController::class, 'export'])->name('export');
+        Route::post('/cleanup', [AuditController::class, 'cleanup'])->name('cleanup');
+    });
     
     // Perfil do Usuário
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

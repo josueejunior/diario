@@ -9,6 +9,7 @@ use App\Models\Tipo;
 use App\Models\Orgao;
 use App\Models\Download;
 use App\Models\Visualizacao;
+use App\Services\SearchService;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -102,31 +103,69 @@ class HomeController extends Controller
         ));
     }
     
-    public function buscar(Request $request)
+    public function buscar(Request $request, SearchService $searchService)
     {
-        $query = $request->get('q');
+        $params = $request->all();
         
-        if (empty($query)) {
+        if (empty($params['q']) && empty(array_filter($params, function($key) {
+            return in_array($key, ['tipo_id', 'orgao_id', 'data_inicio', 'data_fim', 'ano', 'mes']);
+        }, ARRAY_FILTER_USE_KEY))) {
             return redirect()->route('home');
         }
         
-        // Buscar em matérias
-        $materias = Materia::with(['tipo', 'orgao'])
-            ->where('status', 'aprovado')
-            ->where(function ($q) use ($query) {
-                $q->where('titulo', 'LIKE', "%{$query}%")
-                  ->orWhere('texto', 'LIKE', "%{$query}%")
-                  ->orWhere('numero', 'LIKE', "%{$query}%");
-            })
-            ->orderBy('data', 'desc')
-            ->paginate(20);
+        // Buscar matérias com o novo serviço
+        $materiasQuery = $searchService->search($params);
+        $materias = $materiasQuery->paginate(20)->appends($request->query());
         
-        // Buscar em edições
-        $edicoes = Edicao::where('numero', 'LIKE', "%{$query}%")
-            ->orWhereDate('data', $query)
-            ->orderBy('data', 'desc')
-            ->get();
+        // Buscar edições se aplicável
+        $edicoes = collect();
+        if (!empty($params['q']) || !empty($params['numero'])) {
+            $edicoesQuery = $searchService->searchEdicoes($params);
+            $edicoes = $edicoesQuery->limit(10)->get();
+        }
         
-        return view('portal.busca.resultados', compact('materias', 'edicoes', 'query'));
+        // Estatísticas de busca
+        $searchStats = $searchService->getSearchStats();
+        
+        // Sugestões se não houve resultados
+        $suggestions = collect();
+        if ($materias->isEmpty() && !empty($params['q'])) {
+            $suggestions = $searchService->getSuggestions($params['q']);
+        }
+        
+        // Dados para filtros
+        $tipos = \App\Models\Tipo::orderBy('nome')->get();
+        $orgaos = \App\Models\Orgao::orderBy('nome')->get();
+        $anos = \App\Models\Materia::selectRaw('YEAR(data) as ano')
+            ->distinct()
+            ->orderBy('ano', 'desc')
+            ->pluck('ano');
+        
+        return view('portal.busca.resultados', compact(
+            'materias', 
+            'edicoes', 
+            'params',
+            'searchStats',
+            'suggestions',
+            'tipos',
+            'orgaos',
+            'anos'
+        ));
+    }
+
+    /**
+     * API para busca rápida (autocomplete)
+     */
+    public function quickSearch(Request $request, SearchService $searchService)
+    {
+        $term = $request->get('q');
+        
+        if (strlen($term) < 3) {
+            return response()->json([]);
+        }
+        
+        $results = $searchService->quickSearch($term, 10);
+        
+        return response()->json($results);
     }
 }

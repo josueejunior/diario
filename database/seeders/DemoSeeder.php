@@ -71,7 +71,7 @@ class DemoSeeder extends Seeder
                     'data' => now()->subDays(30 - $i * 5),
                     'tipo' => 'normal',
                     'hash' => Str::random(16),
-                    'caminho_arquivo' => 'edicoes/' . $i . '.pdf',
+                    'arquivo_pdf' => 'edicoes/' . $i . '.pdf',
                     'carimbo_tempo' => now(),
                     'signatario' => 'Autoridade Certificadora',
                     'ac' => 'AC-DIARIO',
@@ -81,7 +81,7 @@ class DemoSeeder extends Seeder
             );
             
             // Criar arquivo PDF fake se não existir
-            $caminhoCompleto = storage_path('app/public/' . $edicao->caminho_arquivo);
+            $caminhoCompleto = storage_path('app/public/' . $edicao->arquivo_pdf);
             $diretorio = dirname($caminhoCompleto);
             if (!file_exists($diretorio)) {
                 mkdir($diretorio, 0755, true);

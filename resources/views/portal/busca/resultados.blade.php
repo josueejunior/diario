@@ -1,182 +1,348 @@
-@extends('layouts.portal')
+@extends('layouts.app')
 
-@section('title', "Resultados da Busca: {$query}")
+@section('title', 'Resultados da Busca - Diário Oficial')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Cabeçalho dos Resultados -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">
-                Resultados da Busca
-            </h1>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p class="text-blue-800">
-                    <i class="fas fa-search mr-2"></i>
-                    Você pesquisou por: <strong>"{{ $query }}"</strong>
-                </p>
-                <p class="text-blue-600 text-sm mt-1">
-                    {{ $materias->total() + $edicoes->count() }} resultado(s) encontrado(s)
-                </p>
-            </div>
-        </div>
-
-        <!-- Filtros de Resultado -->
-        <div class="mb-6">
-            <div class="flex flex-wrap gap-2">
-                <button class="filter-btn active" data-filter="all">
-                    <i class="fas fa-list mr-1"></i>
-                    Todos ({{ $materias->total() + $edicoes->count() }})
-                </button>
-                @if($materias->total() > 0)
-                    <button class="filter-btn" data-filter="materias">
-                        <i class="fas fa-file-alt mr-1"></i>
-                        Matérias ({{ $materias->total() }})
-                    </button>
-                @endif
-                @if($edicoes->count() > 0)
-                    <button class="filter-btn" data-filter="edicoes">
-                        <i class="fas fa-newspaper mr-1"></i>
-                        Edições ({{ $edicoes->count() }})
-                    </button>
-                @endif
-            </div>
-        </div>
-
-        <!-- Resultados das Matérias -->
-        @if($materias->total() > 0)
-            <div class="results-section" id="materias-section">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-file-alt text-blue-600 mr-2"></i>
-                    Matérias Encontradas
-                    <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ $materias->total() }}</span>
-                </h2>
-
-                <div class="space-y-6">
-                    @foreach($materias as $materia)
-                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex items-center space-x-2">
-                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                        {{ $materia->tipo->nome }}
-                                    </span>
-                                    <span class="text-gray-500 text-sm">
-                                        {{ $materia->orgao->sigla }}
-                                    </span>
-                                    <span class="text-gray-400 text-sm">•</span>
-                                    <span class="text-gray-500 text-sm">
-                                        {{ $materia->data->format('d/m/Y') }}
-                                    </span>
-                                </div>
-                                <span class="text-xs text-gray-400">
-                                    Nº {{ $materia->numero }}
-                                </span>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar com Filtros -->
+        <div class="col-lg-3 col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">🔍 Filtros de Busca</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ route('home.buscar') }}" id="searchFilters">
+                        <!-- Busca por Texto -->
+                        <div class="mb-3">
+                            <label for="q" class="form-label">Termo de Busca</label>
+                            <div class="input-group">
+                                <input type="text" 
+                                       name="q" 
+                                       id="q" 
+                                       class="form-control" 
+                                       value="{{ $params['q'] ?? '' }}"
+                                       placeholder="Digite sua busca..."
+                                       autocomplete="off">
+                                <button type="button" class="btn btn-outline-secondary" id="clearSearch">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
+                            <div id="searchSuggestions" class="list-group mt-1" style="display: none;"></div>
+                        </div>
 
-                            <h3 class="text-xl font-semibold text-gray-900 mb-3 hover:text-blue-600">
-                                <a href="{{ route('portal.materias.show', $materia) }}">
-                                    {{ $materia->titulo }}
-                                </a>
-                            </h3>
+                        <!-- Tipo de Documento -->
+                        <div class="mb-3">
+                            <label for="tipo_id" class="form-label">Tipo de Documento</label>
+                            <select name="tipo_id" id="tipo_id" class="form-select">
+                                <option value="">Todos os tipos</option>
+                                @foreach($tipos as $tipo)
+                                    <option value="{{ $tipo->id }}" {{ ($params['tipo_id'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                        {{ $tipo->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                            <div class="text-gray-600 mb-4">
-                                <p class="line-clamp-3">
-                                    {!! Str::limit(strip_tags($materia->texto), 200) !!}
-                                </p>
-                            </div>
+                        <!-- Órgão -->
+                        <div class="mb-3">
+                            <label for="orgao_id" class="form-label">Órgão</label>
+                            <select name="orgao_id" id="orgao_id" class="form-select">
+                                <option value="">Todos os órgãos</option>
+                                @foreach($orgaos as $orgao)
+                                    <option value="{{ $orgao->id }}" {{ ($params['orgao_id'] ?? '') == $orgao->id ? 'selected' : '' }}>
+                                        {{ $orgao->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm text-gray-500">
-                                    <span class="flex items-center">
-                                        <i class="fas fa-building mr-1"></i>
-                                        {{ $materia->orgao->nome }}
-                                    </span>
+                        <!-- Período -->
+                        <div class="mb-3">
+                            <label class="form-label">Período</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <input type="date" 
+                                           name="data_inicio" 
+                                           class="form-control form-control-sm" 
+                                           value="{{ $params['data_inicio'] ?? '' }}"
+                                           placeholder="De">
                                 </div>
-                                <a href="{{ route('portal.materias.show', $materia) }}" 
-                                   class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200">
-                                    <span>Ler na íntegra</span>
-                                    <i class="fas fa-arrow-right ml-1"></i>
-                                </a>
+                                <div class="col-6">
+                                    <input type="date" 
+                                           name="data_fim" 
+                                           class="form-control form-control-sm" 
+                                           value="{{ $params['data_fim'] ?? '' }}"
+                                           placeholder="Até">
+                                </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
 
-                <!-- Paginação das Matérias -->
-                @if($materias->hasPages())
-                    <div class="mt-8">
-                        {{ $materias->appends(['q' => $query])->links() }}
+                        <!-- Ano -->
+                        <div class="mb-3">
+                            <label for="ano" class="form-label">Ano</label>
+                            <select name="ano" id="ano" class="form-select">
+                                <option value="">Todos os anos</option>
+                                @foreach($anos as $ano)
+                                    <option value="{{ $ano }}" {{ ($params['ano'] ?? '') == $ano ? 'selected' : '' }}>
+                                        {{ $ano }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <a href="{{ route('home.buscar') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Limpar Filtros
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Estatísticas -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="text-muted">📊 Estatísticas</h6>
+                        <ul class="list-unstyled small">
+                            <li><strong>{{ number_format($searchStats['total_documents']) }}</strong> documentos</li>
+                            <li><strong>{{ $searchStats['total_types'] }}</strong> tipos</li>
+                            <li><strong>{{ $searchStats['total_organs'] }}</strong> órgãos</li>
+                        </ul>
                     </div>
-                @endif
+                </div>
             </div>
-        @endif
+        </div>
 
-        <!-- Resultados das Edições -->
-        @if($edicoes->count() > 0)
-            <div class="results-section mt-12" id="edicoes-section">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
-                    <i class="fas fa-newspaper text-blue-600 mr-2"></i>
-                    Edições Encontradas
-                    <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ $edicoes->count() }}</span>
-                </h2>
+        <div class="col-lg-9 col-md-8">
+            <!-- Cabeçalho dos Resultados -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">
+                        @if(!empty($params['q']))
+                            Resultados para: "{{ $params['q'] }}"
+                        @else
+                            Resultados da Busca Avançada
+                        @endif
+                    </h1>
+                    <p class="text-muted">
+                        {{ $materias->total() }} {{ Str::plural('documento', $materias->total()) }} encontrado{{ $materias->total() > 1 ? 's' : '' }}
+                        @if($edicoes->isNotEmpty())
+                            + {{ $edicoes->count() }} {{ Str::plural('edição', $edicoes->count()) }}
+                        @endif
+                    </p>
+                </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($edicoes as $edicao)
-                        <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 p-6">
-                            <div class="text-center">
-                                <div class="bg-blue-100 rounded-full p-4 mx-auto mb-4 w-16 h-16 flex items-center justify-center">
-                                    <i class="fas fa-newspaper text-2xl text-blue-600"></i>
+            <!-- Sugestões (se não há resultados) -->
+            @if($materias->isEmpty() && isset($suggestions) && $suggestions->isNotEmpty())
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">💡 Nenhum resultado encontrado</h5>
+                    <p>Tente buscar por:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach($suggestions as $suggestion)
+                            <a href="{{ route('home.buscar', ['q' => $suggestion]) }}" class="badge bg-primary text-decoration-none">
+                                {{ $suggestion }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <!-- Edições Encontradas -->
+            @if($edicoes->isNotEmpty())
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">📰 Edições Encontradas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach($edicoes as $edicao)
+                                <div class="col-lg-6 mb-3">
+                                    <div class="d-flex align-items-center p-3 border rounded">
+                                        <div class="me-3">
+                                            <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{{ route('portal.edicoes.show', $edicao) }}" class="text-decoration-none">
+                                                    Edição {{ $edicao->numero }}
+                                                </a>
+                                            </h6>
+                                            <p class="text-muted small mb-0">
+                                                📅 {{ $edicao->data->format('d/m/Y') }} • 
+                                                📄 {{ $edicao->materias->count() }} matérias
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                                    Edição {{ $edicao->numero }}
-                                </h3>
-                                
-                                <p class="text-gray-600 mb-2">
-                                    {{ $edicao->data->format('d/m/Y') }}
-                                </p>
-                                
-                                <div class="text-sm text-gray-500 mb-4">
-                                    <span class="flex items-center justify-center">
-                                        <i class="fas fa-file-alt mr-1"></i>
-                                        {{ $edicao->materias()->count() }} matéria(s)
-                                    </span>
-                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
 
-                                <div class="flex space-x-2 justify-center">
-                                    <a href="{{ route('portal.edicoes.show', $edicao) }}" 
-                                       class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors duration-200">
-                                        <i class="fas fa-eye mr-1"></i>
-                                        Ver
-                                    </a>
-                                    @if($edicao->caminho_arquivo)
-                                        <a href="{{ asset('storage/' . $edicao->caminho_arquivo) }}" 
-                                           download
-                                           class="inline-flex items-center px-3 py-2 bg-gray-600 text-white text-xs font-medium rounded hover:bg-gray-700 transition-colors duration-200">
-                                            <i class="fas fa-download mr-1"></i>
-                                            PDF
+            <!-- Resultados de Matérias -->
+            @if($materias->isNotEmpty())
+                <div class="row">
+                    @foreach($materias as $materia)
+                        <div class="col-12 mb-4">
+                            <div class="card h-100 search-result-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="d-flex gap-2">
+                                            <span class="badge bg-primary">{{ $materia->tipo->nome }}</span>
+                                            <span class="badge bg-secondary">{{ $materia->orgao->sigla }}</span>
+                                        </div>
+                                        <small class="text-muted">{{ $materia->data->format('d/m/Y') }}</small>
+                                    </div>
+                                    
+                                    <h5 class="card-title">
+                                        <a href="{{ route('portal.materias.show', $materia) }}" class="text-decoration-none">
+                                            {{ $materia->titulo }}
                                         </a>
-                                    @endif
+                                    </h5>
+                                    
+                                    <p class="card-text">
+                                        {{ Str::limit(strip_tags($materia->texto), 200) }}
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="text-muted small">
+                                            📄 {{ $materia->numero }} • 
+                                            🏢 {{ $materia->orgao->nome }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-            </div>
-        @endif
 
-        <!-- Nenhum Resultado Encontrado -->
-        @if($materias->total() == 0 && $edicoes->count() == 0)
-            <div class="text-center py-12">
-                <div class="bg-gray-100 rounded-full p-6 mx-auto mb-4 w-24 h-24 flex items-center justify-center">
-                    <i class="fas fa-search text-4xl text-gray-400"></i>
+                <!-- Paginação -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $materias->appends(request()->query())->links() }}
                 </div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-2">
-                    Nenhum resultado encontrado
-                </h3>
-                <p class="text-gray-600 mb-6">
-                    Não foi possível encontrar resultados para "<strong>{{ $query }}</strong>".
-                </p>
+            @elseif(empty($suggestions) || !isset($suggestions))
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Nenhum documento encontrado</h4>
+                    <p class="text-muted">Tente ajustar os filtros ou usar termos de busca diferentes.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+@push('styles')
+<style>
+.search-result-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.search-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.search-result-card .card-title a {
+    color: #333;
+}
+
+.search-result-card .card-title a:hover {
+    color: #007bff;
+}
+
+#searchSuggestions {
+    position: absolute;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sticky-top {
+    z-index: 10;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('q');
+    const suggestionsContainer = document.getElementById('searchSuggestions');
+    const clearButton = document.getElementById('clearSearch');
+    
+    let searchTimeout;
+    
+    // Auto-complete search
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        clearTimeout(searchTimeout);
+        
+        if (query.length < 3) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+            fetch(`{{ route('home.quick-search') }}?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(results => {
+                    if (results.length > 0) {
+                        let html = '';
+                        results.forEach(result => {
+                            html += `
+                                <a href="${result.url}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>${result.titulo}</strong><br>
+                                            <small class="text-muted">${result.tipo} • ${result.orgao} • ${result.data}</small>
+                                        </div>
+                                        <span class="badge bg-secondary">${result.numero}</span>
+                                    </div>
+                                </a>
+                            `;
+                        });
+                        suggestionsContainer.innerHTML = html;
+                        suggestionsContainer.style.display = 'block';
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                })
+                .catch(() => {
+                    suggestionsContainer.style.display = 'none';
+                });
+        }, 300);
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+    
+    // Clear search
+    clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        suggestionsContainer.style.display = 'none';
+        searchInput.focus();
+    });
+    
+    // Auto-submit form when filters change
+    document.querySelectorAll('#searchFilters select, #searchFilters input[type="date"]').forEach(element => {
+        element.addEventListener('change', function() {
+            document.getElementById('searchFilters').submit();
+        });
+    });
+});
+</script>
+@endpush
+@endsection
                 <div class="space-y-2 text-sm text-gray-500">
                     <p><strong>Dicas de pesquisa:</strong></p>
                     <ul class="list-disc list-inside space-y-1 text-left max-w-md mx-auto">
