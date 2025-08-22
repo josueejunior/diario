@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Portal\EdicaoController as PortalEdicaoController;
 use App\Http\Controllers\Portal\MateriaController as PortalMateriaController;
+use App\Http\Controllers\Portal\SubscriptionController;
 use App\Http\Controllers\Admin\EdicaoController;
 use App\Http\Controllers\Admin\MateriaController;
 use App\Http\Controllers\Admin\TipoController;
