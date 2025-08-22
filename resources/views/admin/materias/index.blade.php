@@ -11,7 +11,7 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold">Lista de Matérias</h3>
-                        <a href="{{ route('materias.create') }}" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 shadow-sm">
+                        <a href="{{ route('admin.materias.create') }}" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 shadow-sm">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -27,7 +27,7 @@
 
                     <!-- Formulário de Filtros -->
                     <div class="mb-6 bg-gray-50 p-4 rounded">
-                        <form action="{{ route('materias.index') }}" method="GET" class="flex flex-wrap gap-4">
+                        <form action="{{ route('admin.materias.index') }}" method="GET" class="flex flex-wrap gap-4">
                             <div class="flex-1">
                                 <label for="search" class="block text-sm font-medium text-gray-700">Busca</label>
                                 <input type="text" name="search" id="search" value="{{ request('search') }}" 
@@ -68,7 +68,7 @@
                                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                     Filtrar
                                 </button>
-                                <a href="{{ route('materias.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                <a href="{{ route('admin.materias.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ml-2">
                                     Limpar
                                 </a>
                             </div>
@@ -113,19 +113,19 @@
                                         </td>
                                         <td class="py-2 px-4 border-b">
                                             <div class="flex items-center space-x-1 whitespace-nowrap">
-                                                <a href="{{ route('materias.show', $materia) }}" class="inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
+                                                <a href="{{ route('admin.materias.show', $materia) }}" class="inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                     </svg>
                                                 </a>
-                                                <a href="{{ route('materias.edit', $materia) }}" class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors duration-200">
+                                                <a href="{{ route('admin.materias.edit', $materia) }}" class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors duration-200">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                                     </svg>
                                                 </a>
                                                 @if ($materia->status === 'pendente')
-                                                    <form method="POST" action="{{ route('materias.aprovar', $materia) }}" class="inline-block">
+                                                    <form method="POST" action="{{ route('admin.materias.aprovar', $materia) }}" class="inline-block">
                                                         @csrf
                                                         <button type="submit" class="inline-flex items-center px-2 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -134,7 +134,7 @@
                                                         </button>
                                                     </form>
                                                 @endif
-                                                <form method="POST" action="{{ route('materias.destroy', $materia) }}" class="inline-block" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria?');">
+                                                <form method="POST" action="{{ route('admin.materias.destroy', $materia) }}" class="inline-block" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="inline-flex items-center px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200">

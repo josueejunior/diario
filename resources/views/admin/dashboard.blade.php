@@ -32,7 +32,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 pt-4 border-t">
-                                <a href="{{ route('materias.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
+                                <a href="{{ route('admin.materias.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
                                     Ver todas
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -62,7 +62,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 pt-4 border-t">
-                                <a href="{{ route('edicoes.index') }}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors duration-200">
+                                <a href="{{ route('admin.edicoes.index') }}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors duration-200">
                                     Ver todas
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -92,7 +92,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 pt-4 border-t">
-                                <a href="{{ route('relatorios.downloads') }}" class="inline-flex items-center text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors duration-200">
+                                <a href="{{ route('admin.relatorios.downloads') }}" class="inline-flex items-center text-purple-600 hover:text-purple-800 text-sm font-medium transition-colors duration-200">
                                     Ver relatório
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -123,7 +123,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 pt-4 border-t">
-                                <a href="{{ route('relatorios.visualizacoes') }}" class="inline-flex items-center text-amber-600 hover:text-amber-800 text-sm font-medium transition-colors duration-200">
+                                <a href="{{ route('admin.relatorios.visualizacoes') }}" class="inline-flex items-center text-amber-600 hover:text-amber-800 text-sm font-medium transition-colors duration-200">
                                     Ver relatório
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -138,7 +138,7 @@
                 <div class="mt-8">
                     <h3 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">Ações Rápidas</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{{ route('materias.create') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 border border-indigo-200 shadow-sm hover:shadow">
+                        <a href="{{ route('admin.materias.create') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 border border-indigo-200 shadow-sm hover:shadow">
                             <div class="p-3 mr-4 rounded-full bg-indigo-500 text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -149,7 +149,7 @@
                                 <p class="text-indigo-500 text-sm">Criar publicação</p>
                             </div>
                         </a>
-                        <a href="{{ route('edicoes.create') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border border-green-200 shadow-sm hover:shadow">
+                        <a href="{{ route('admin.edicoes.create') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border border-green-200 shadow-sm hover:shadow">
                             <div class="p-3 mr-4 rounded-full bg-green-500 text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -160,7 +160,7 @@
                                 <p class="text-green-500 text-sm">Criar diário</p>
                             </div>
                         </a>
-                        <a href="{{ route('tipos.index') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 shadow-sm hover:shadow">
+                        <a href="{{ route('admin.tipos.index') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border border-purple-200 shadow-sm hover:shadow">
                             <div class="p-3 mr-4 rounded-full bg-purple-500 text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -171,7 +171,7 @@
                                 <p class="text-purple-500 text-sm">Categorias de matérias</p>
                             </div>
                         </a>
-                        <a href="{{ route('orgaos.index') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 border border-amber-200 shadow-sm hover:shadow">
+                        <a href="{{ route('admin.orgaos.index') }}" class="flex items-center p-4 rounded-lg transition-all duration-200 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 border border-amber-200 shadow-sm hover:shadow">
                             <div class="p-3 mr-4 rounded-full bg-amber-500 text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

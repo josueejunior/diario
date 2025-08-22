@@ -53,7 +53,7 @@ Route::prefix('diario')->group(function () {
     
     // Verificação de Autenticidade
     Route::get('/verificar', [PortalEdicaoController::class, 'verificar'])->name('portal.verificar');
-    Route::post('/verificar', [PortalEdicaoController::class, 'verificarHash'])->name('portal.verificar');
+    Route::post('/verificar', [PortalEdicaoController::class, 'verificarHash'])->name('portal.verificar.check');
 
     // Atos individuais com URLs permanentes
     Route::get('/ato/{materia}', [AtoController::class, 'show'])->name('portal.atos.show');
@@ -79,35 +79,146 @@ Route::prefix('diario')->group(function () {
 
 // Rotas Administrativas
 Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(function () {
-    Route::get('/dashboard', function () {
+    // Dashboard Principal AdminLTE
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
+    
+    // Dashboard antigo (manter compatibilidade)
+    Route::get('/dashboard-old', function () {
         return view('admin.dashboard');
-    })->name('dashboard');
-
-    // Edições
-    Route::resource('edicoes', EdicaoController::class, ['parameters' => ['edicoes' => 'edicao']]);
-    Route::post('/edicoes/{edicao}/publicar', [EdicaoController::class, 'publicar'])->name('edicoes.publicar');
-    Route::post('/edicoes/{edicao}/assinar', [EdicaoController::class, 'assinar'])->name('edicoes.assinar');
+    })->name('dashboard');    // Edições
+    Route::resource('edicoes', EdicaoController::class, ['parameters' => ['edicoes' => 'edicao']])->names([
+        'index' => 'admin.edicoes.index',
+        'create' => 'admin.edicoes.create',
+        'store' => 'admin.edicoes.store',
+        'show' => 'admin.edicoes.show',
+        'edit' => 'admin.edicoes.edit',
+        'update' => 'admin.edicoes.update',
+        'destroy' => 'admin.edicoes.destroy'
+    ]);
+    Route::post('/edicoes/{edicao}/publicar', [EdicaoController::class, 'publicar'])->name('admin.edicoes.publicar');
+    Route::post('/edicoes/{edicao}/assinar', [EdicaoController::class, 'assinar'])->name('admin.edicoes.assinar');
     
     // Matérias
-    Route::resource('materias', MateriaController::class, ['parameters' => ['materias' => 'materia']]);
-    Route::post('/materias/{materia}/aprovar', [MateriaController::class, 'aprovar'])->name('materias.aprovar');
-    Route::post('/materias/{materia}/revisar', [MateriaController::class, 'revisar'])->name('materias.revisar');
+    Route::resource('materias', MateriaController::class, ['parameters' => ['materias' => 'materia']])->names([
+        'index' => 'admin.materias.index',
+        'create' => 'admin.materias.create',
+        'store' => 'admin.materias.store',
+        'show' => 'admin.materias.show',
+        'edit' => 'admin.materias.edit',
+        'update' => 'admin.materias.update',
+        'destroy' => 'admin.materias.destroy'
+    ]);
+    Route::post('/materias/{materia}/aprovar', [MateriaController::class, 'aprovar'])->name('admin.materias.aprovar');
+    Route::post('/materias/{materia}/revisar', [MateriaController::class, 'revisar'])->name('admin.materias.revisar');
     
     // Tipos de Matéria
-    Route::resource('tipos', TipoController::class, ['parameters' => ['tipos' => 'tipo']]);
+    Route::resource('tipos', TipoController::class, ['parameters' => ['tipos' => 'tipo']])->names([
+        'index' => 'admin.tipos.index',
+        'create' => 'admin.tipos.create',
+        'store' => 'admin.tipos.store',
+        'show' => 'admin.tipos.show',
+        'edit' => 'admin.tipos.edit',
+        'update' => 'admin.tipos.update',
+        'destroy' => 'admin.tipos.destroy'
+    ]);
     
     // Órgãos
-    Route::resource('orgaos', OrgaoController::class, ['parameters' => ['orgaos' => 'orgao']]);
-    
-    // Assinaturas
-    Route::get('/assinaturas', [AssinaturaController::class, 'index'])->name('assinaturas.index');
-    Route::get('/assinaturas/{assinatura}', [AssinaturaController::class, 'show'])->name('assinaturas.show');
-    
+    Route::resource('orgaos', OrgaoController::class, ['parameters' => ['orgaos' => 'orgao']])->names([
+        'index' => 'admin.orgaos.index',
+        'create' => 'admin.orgaos.create',
+        'store' => 'admin.orgaos.store',
+        'show' => 'admin.orgaos.show',
+        'edit' => 'admin.orgaos.edit',
+        'update' => 'admin.orgaos.update',
+        'destroy' => 'admin.orgaos.destroy'
+    ]);
+
+    // Assinatura Digital
+    Route::prefix('assinatura')->group(function () {
+        Route::get('/dashboard', [AssinaturaController::class, 'dashboard'])->name('admin.assinatura.dashboard');
+        Route::get('/certificados', [AssinaturaController::class, 'certificados'])->name('admin.certificados.index');
+        Route::get('/validacao', [AssinaturaController::class, 'validacao'])->name('admin.assinatura.validacao');
+        Route::post('/validar', [AssinaturaController::class, 'validar'])->name('admin.assinatura.validar');
+    });
+
+    // Notificações & Webhooks
+    Route::prefix('notifications')->group(function () {
+        Route::get('/subscriptions', [\App\Http\Controllers\Admin\SubscriptionController::class, 'index'])->name('admin.subscriptions.index');
+        Route::get('/webhooks', [\App\Http\Controllers\Admin\WebhookController::class, 'index'])->name('admin.webhooks.index');
+        Route::get('/history', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
+    });
+
+    // Workflow & Aprovação
+    Route::prefix('workflow')->group(function () {
+        Route::get('/pending', [\App\Http\Controllers\Admin\ApprovalController::class, 'pending'])->name('admin.approval.pending');
+        Route::get('/configure', [\App\Http\Controllers\Admin\WorkflowController::class, 'index'])->name('admin.workflow.index');
+        Route::get('/history', [\App\Http\Controllers\Admin\ApprovalController::class, 'history'])->name('admin.approval.history');
+    });
+
     // Relatórios
-    Route::get('/relatorios', [RelatorioController::class, 'index'])->name('relatorios.index');
-    Route::get('/relatorios/downloads', [RelatorioController::class, 'downloads'])->name('relatorios.downloads');
-    Route::get('/relatorios/visualizacoes', [RelatorioController::class, 'visualizacoes'])->name('relatorios.visualizacoes');
-    Route::get('/relatorios/publicacoes', [RelatorioController::class, 'publicacoes'])->name('relatorios.publicacoes');
+    Route::prefix('relatorios')->group(function () {
+        Route::get('/', [RelatorioController::class, 'index'])->name('admin.relatorios.index');
+        Route::get('/downloads', [RelatorioController::class, 'downloads'])->name('admin.relatorios.downloads');
+        Route::get('/visualizacoes', [RelatorioController::class, 'visualizacoes'])->name('admin.relatorios.visualizacoes');
+        Route::get('/publicacoes', [RelatorioController::class, 'publicacoes'])->name('admin.relatorios.publicacoes');
+    });
+
+    // Usuários & Permissões
+    Route::prefix('users')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/roles', [\App\Http\Controllers\Admin\RoleController::class, 'index'])->name('admin.roles.index');
+        Route::get('/permissions', [\App\Http\Controllers\Admin\PermissionController::class, 'index'])->name('admin.permissions.index');
+    });
+
+    // Configurações
+    Route::prefix('configuracoes')->group(function () {
+        Route::get('/geral', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'geral'])->name('admin.configuracoes.geral');
+        Route::post('/geral', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'atualizarGeral'])->name('admin.configuracoes.geral.update');
+        
+        Route::get('/email', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'email'])->name('admin.configuracoes.email');
+        Route::post('/email', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'atualizarEmail'])->name('admin.configuracoes.email.update');
+        Route::post('/email/test', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'testarEmail'])->name('admin.configuracoes.email.test');
+        
+        Route::get('/whatsapp', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'whatsapp'])->name('admin.configuracoes.whatsapp');
+        Route::post('/whatsapp', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'atualizarWhatsapp'])->name('admin.configuracoes.whatsapp.update');
+        Route::post('/whatsapp/test', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'testarWhatsapp'])->name('admin.configuracoes.whatsapp.test');
+    });
+
+    // Sistema & Backup
+    Route::prefix('sistema')->group(function () {
+        Route::get('/info', [\App\Http\Controllers\Admin\AdminController::class, 'systemInfo'])->name('admin.sistema.info');
+        Route::post('/cache/clear', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'limparCache'])->name('admin.sistema.cache.clear');
+        Route::post('/optimize', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'otimizar'])->name('admin.sistema.optimize');
+    });
+
+    Route::prefix('backup')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'backup'])->name('admin.backup.index');
+        Route::post('/create', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'criarBackup'])->name('admin.backup.create');
+        Route::get('/download/{filename}', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'downloadBackup'])->name('admin.backup.download');
+        Route::delete('/{filename}', [\App\Http\Controllers\Admin\ConfiguracaoController::class, 'excluirBackup'])->name('admin.backup.delete');
+    });
+
+    // Ferramentas
+    Route::prefix('ferramentas')->group(function () {
+        Route::get('/search', [\App\Http\Controllers\Admin\SearchController::class, 'advanced'])->name('admin.search.advanced');
+        Route::get('/migration', [\App\Http\Controllers\Admin\MigrationController::class, 'dashboard'])->name('admin.migration.dashboard');
+        Route::get('/observability', [\App\Http\Controllers\Admin\ObservabilityController::class, 'index'])->name('admin.ferramentas.observability');
+        Route::get('/accessibility', [\App\Http\Controllers\Admin\AccessibilityController::class, 'index'])->name('admin.ferramentas.accessibility');
+    });
+
+    // API & Dados Abertos
+    Route::prefix('api')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\ApiController::class, 'dashboard'])->name('admin.api.dashboard');
+        Route::get('/tokens', [\App\Http\Controllers\Admin\ApiController::class, 'tokens'])->name('admin.api.tokens');
+        Route::get('/opendata', [\App\Http\Controllers\Admin\OpenDataController::class, 'catalog'])->name('admin.opendata.catalog');
+    });
+
+    // Busca Global
+    Route::get('/search', [\App\Http\Controllers\Admin\AdminController::class, 'search'])->name('admin.search');
+
+    // Perfil do Usuário
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminController::class, 'profileEdit'])->name('admin.profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Admin\AdminController::class, 'profileUpdate'])->name('admin.profile.update');
     
     // Auditoria
     Route::prefix('auditoria')->middleware('audit')->group(function () {
@@ -117,8 +228,8 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'audit'])->group(functio
         Route::get('/{auditLog}', [AuditController::class, 'show'])->name('admin.audit.show');
         Route::post('/limpar', [AuditController::class, 'cleanup'])->name('admin.audit.cleanup');
     });
-    
-    // Perfil do Usuário
+
+    // Manter rotas antigas para compatibilidade
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
