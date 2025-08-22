@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,9 +13,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('materias', function (Blueprint $table) {
-            // Adicionar índices FULLTEXT para busca inteligente
-            DB::statement('ALTER TABLE materias ADD FULLTEXT(titulo, texto) WITH PARSER ngram');
-            
             // Adicionar campos de metadados para busca
             $table->json('keywords')->nullable()->after('texto');
             $table->json('tags')->nullable()->after('keywords');
@@ -22,6 +20,9 @@ return new class extends Migration
             $table->index(['tipo_id', 'orgao_id', 'data']);
             $table->index('processo_numero');
         });
+        
+        // Adicionar índice FULLTEXT separadamente (sem parser específico)
+        DB::statement('ALTER TABLE materias ADD FULLTEXT(titulo, texto)');
     }
 
     /**
